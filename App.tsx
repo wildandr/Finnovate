@@ -1,12 +1,14 @@
 // App.tsx
 import React from 'react';
-import OnboardingScreen from './src/screens/OnboardingScreen';
-import Navigation from './navigation';
-import RegisterScreen from './src/screens/RegisterScreen';
+import { NavigationContainer } from '@react-navigation/native';
+import BottomTabNavigator from './BottomTabNavigator';
 
 const App = () => {
-  // return <RegisterScreen />;
-   return <Navigation />;
+  return (
+    <NavigationContainer>
+      <BottomTabNavigator />
+    </NavigationContainer>
+  );
 };
 
 export default App;

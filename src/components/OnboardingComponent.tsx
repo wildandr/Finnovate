@@ -23,7 +23,13 @@ const OnboardingComponent: React.FC = () => {
         },
         {
           backgroundColor: 'transparent',
-          image: <View style={styles.slideContainer}><Image source={require('../assets/onboarding2.png')} /></View>,
+          image: <View style={styles.slideContainer2}><Image source={require('../assets/onboarding2.png')} /></View>,
+          title: 'Stocks is god',
+          subtitle: <OnboardingSlide text={text}/>,
+        },
+        {
+          backgroundColor: 'transparent',
+          image: <View style={styles.slideContainer3}><Image source={require('../assets/onboarding2.png')} /></View>,
           title: 'Stocks is god',
           subtitle: <OnboardingSlide text={text} showButton />,
         },
@@ -33,7 +39,10 @@ const OnboardingComponent: React.FC = () => {
 }
 
 const styles = StyleSheet.create({
-  slideContainer: {
+  slideContainer2: {
+    marginTop: 40, // Adjust this value as needed
+  },
+  slideContainer3: {
     marginTop: 100, // Adjust this value as needed
   },
 });
