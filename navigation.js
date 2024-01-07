@@ -11,7 +11,7 @@ export default function Navigation() {
         screenOptions={{
           headerShown: false,
         }}>
-        {/* Navigate taro sini ya kawan */}
+        {/* Navigate taro sini ya nanti jangan lupa import */}
       </Stack.Navigator>
     </NavigationContainer>
   );
