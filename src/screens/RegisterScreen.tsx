@@ -5,9 +5,11 @@ import tw from 'tailwind-react-native-classnames';
 import SignUpButton from '../components/Register_SignUpButton';
 import CustomTextInput from '../components/Register_TextInput';
 import GoogleLoginButton from '../components/GoogleLoginButton';
+import { useNavigation } from '@react-navigation/native';
 
 const RegisterScreen: React.FC = () => {
     const [isChecked, setIsChecked] = useState(false);
+    const navigation = useNavigation();
 
     return (
         <View style={[tw`p-4 flex-1 justify-center items-center`, { backgroundColor: '#002351' }]}>
@@ -15,17 +17,16 @@ const RegisterScreen: React.FC = () => {
             <CustomTextInput placeholder="Name" />
             <CustomTextInput placeholder="Email/Phone number" />
             <CustomTextInput placeholder="Password" secureTextEntry={true} />
-            <View style={tw`mb-5`}>
-                <Image source={require('../assets/Or.png')} style={{ alignSelf: 'center' }} />
-            </View>
-            <GoogleLoginButton />
             <View style={tw`flex-row items-center mb-4`}>
-                <Checkbox
-                    status={isChecked ? 'checked' : 'unchecked'}
-                    onPress={() => setIsChecked(!isChecked)}
-                    color="blue"
-                    uncheckedColor="red"
-                />
+            <Checkbox
+                status={isChecked ? 'checked' : 'unchecked'}
+                onPress={() => {
+                    console.log('Checkbox pressed');
+                    setIsChecked(!isChecked);
+                }}
+                color="blue"
+                uncheckedColor="red"
+            />
                 <View style={tw`ml-2 flex-shrink`}>
                     <Text style={[tw`text-white`, { fontSize: 12 }]}>
                         I certify that I am 18 years of age or older, I agree to the User Agreement, and I have read the Privacy Policy.
@@ -33,9 +34,13 @@ const RegisterScreen: React.FC = () => {
                 </View>
             </View>
             <SignUpButton />
-            <View style={tw`flex-row justify-center items-center mt-4`}>
+            <View style={tw`my-5`}>
+                <Image source={require('../assets/Or.png')} style={{ alignSelf: 'center' }} />
+            </View>
+            <GoogleLoginButton />
+            <View style={tw`flex-row justify-center items-center`}>
                 <Text style={tw`text-white`}>I already have an account. </Text>
-                <TouchableOpacity onPress={() => { /* Handle navigation here */ }}>
+                <TouchableOpacity onPress={() => navigation.navigate('Login')}>
                     <Text style={[{ fontWeight: 'bold', color: '#FFBC00' }]}>Sign in</Text>
                 </TouchableOpacity>
             </View>

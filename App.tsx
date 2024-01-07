@@ -6,7 +6,7 @@ import RegisterScreen from './src/screens/RegisterScreen';
 
 const App = () => {
   // return <RegisterScreen />;
-  return <Navigation />;
+   return <Navigation />;
 };
 
 export default App;
