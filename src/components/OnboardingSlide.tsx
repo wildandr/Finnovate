@@ -2,7 +2,7 @@
 
 import React from 'react';
 import {Text, View, StyleSheet} from 'react-native';
-import SignUpButton from './SignUpButton';
+import SignUpButton from './Onboarding_SignUpButton';
 
 interface OnboardingSlideProps {
   text: string;
