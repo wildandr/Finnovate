@@ -16,7 +16,7 @@ const SignUpButton: React.FC = () => {
         styles.button,
         tw`h-16 w-96 rounded-lg justify-center items-center`,
       ]}>
-      <Text style={tw`text-white text-lg`}>Sign Up</Text>
+      <Text style={tw`text-white text-lg`}>Get Started</Text>
     </TouchableOpacity>
   );
 };
