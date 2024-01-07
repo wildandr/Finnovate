@@ -3,7 +3,6 @@
 import React from 'react';
 import {Text, View, StyleSheet} from 'react-native';
 import SignUpButton from './SignUpButton';
-import {useNavigation} from '@react-navigation/native';
 
 interface OnboardingSlideProps {
   text: string;
@@ -14,16 +13,10 @@ const OnboardingSlide: React.FC<OnboardingSlideProps> = ({
   text,
   showButton,
 }) => {
-  const navigation = useNavigation();
-
-  const handlePress = () => {
-    navigation.navigate('SignUp');
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{text}</Text>
-      {showButton && <SignUpButton onPress={handlePress} />}
+      {showButton && <SignUpButton />}
     </View>
   );
 };
