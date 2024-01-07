@@ -1,19 +1,29 @@
 // File: components/OnboardingSlide.tsx
 
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import {Text, View, StyleSheet} from 'react-native';
 import SignUpButton from './SignUpButton';
+import {useNavigation} from '@react-navigation/native';
 
 interface OnboardingSlideProps {
   text: string;
   showButton?: boolean;
 }
 
-const OnboardingSlide: React.FC<OnboardingSlideProps> = ({ text, showButton }) => {
+const OnboardingSlide: React.FC<OnboardingSlideProps> = ({
+  text,
+  showButton,
+}) => {
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    navigation.navigate('SignUp');
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{text}</Text>
-      {showButton && <SignUpButton />}
+      {showButton && <SignUpButton onPress={handlePress} />}
     </View>
   );
 };
@@ -23,10 +33,10 @@ const styles = StyleSheet.create({
     marginBottom: 105,
   },
   text: {
-    fontFamily:'Inter-Regular',
+    fontFamily: 'Inter-Regular',
     fontSize: 14,
     color: '#FFFFFF',
-    textAlign:'center',
+    textAlign: 'center',
     lineHeight: 24,
     marginBottom: 60,
   },
