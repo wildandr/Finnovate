@@ -5,6 +5,7 @@ import OnboardingScreen from './src/screens/OnboardingScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
+import PublishScreen from './src/screens/PublishScreen';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,7 @@ export default function Navigation() {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+        <Stack.Screen name="Publish" component={PublishScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
