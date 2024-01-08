@@ -1,10 +1,9 @@
 // File: OnboardingScreen.tsx
 
 import React from 'react';
-import { View } from 'react-native';
-import OnboardingComponent from '../components/OnboardingComponent';
-import { useNavigation } from '@react-navigation/native';
-
+import {View} from 'react-native';
+import OnboardingComponent from '../components/Onboarding/OnboardingComponent';
+import {useNavigation} from '@react-navigation/native';
 
 const OnboardingScreen: React.FC = () => {
   return (

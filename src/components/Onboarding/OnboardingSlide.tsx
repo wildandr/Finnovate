@@ -1,7 +1,5 @@
-// File: components/OnboardingSlide.tsx
-
 import React from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import SignUpButton from './Onboarding_SignUpButton';
 
 interface OnboardingSlideProps {
