@@ -17,7 +17,7 @@ import DetailEquity from './src/screens/Market/DetailEquity';
 import News from './src/screens/Market/News';
 import MarketTechnical from './src/screens/Market/MarketTechnical';
 import MarketFundamental from './src/screens/Market/MarketFundamental';
-import PublishScreen from './src/screens/PublishScreen';
+
 
 // Stack
 const Stack = createStackNavigator();
@@ -39,27 +39,7 @@ function StackGroup() {
 }
 
 // Top Tabs
-const MarketTopTab = createMaterialTopTabNavigator();
 
-function MarketTopTabGroup() {
-  return (
-    <MarketTopTab.Navigator
-      tabBarOptions={{
-        activeTintColor: 'white',
-        inactiveTintColor: 'gray',
-        style: {
-          backgroundColor: '#00112B',
-        },
-        indicatorStyle: {
-          backgroundColor: 'white',
-        },
-      }}>
-      <MarketTopTab.Screen name="News" component={MarketScreen} />
-      <MarketTopTab.Screen name="Technical" component={MarketScreen} />
-      <MarketTopTab.Screen name="Fundamental" component={MarketScreen} />
-    </MarketTopTab.Navigator>
-  );
-    }
 
 // Market Stack
 const MarketStack = createStackNavigator();
@@ -144,14 +124,6 @@ export default function Navigation() {
   return (
     <NavigationContainer>
      <BottomTabNavigator />
-      >
-        <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-        <Stack.Screen name="Publish" component={PublishScreen} />
-      </Stack.Navigator>
     </NavigationContainer>
   );
 }

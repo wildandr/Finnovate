@@ -13,7 +13,6 @@ function MarketTopTabGroup() {
         activeTintColor: 'white',
         inactiveTintColor: 'gray',
         style: {
-          fontWeight: 'bold',
           backgroundColor: '#002351',
         },
         indicatorStyle: {
