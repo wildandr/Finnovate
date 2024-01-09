@@ -14,7 +14,9 @@ const HomeScreen = () => {
       username: 'JohnDoe',
       timestamp: '1 jam yang lalu',
       text: 'Ini adalah feed pertama. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      image: require('../assets/onboarding2.png'),
+      image: require('../assets/onboarding1.png'),
+      likes: 10,
+      comments: 3,
     },
     {
       id: '2',
@@ -22,6 +24,35 @@ const HomeScreen = () => {
       timestamp: '2 jam yang lalu',
       text: 'Ini adalah feed kedua. Ut enim ad minim veniam.',
       image: require('../assets/onboarding1.png'),
+      likes: 10,
+      comments: 3,
+    },
+    {
+      id: '3',
+      username: 'JaneSmith',
+      timestamp: '2 jam yang lalu',
+      text: 'Ini adalah feed kedua. Ut enim ad minim veniam.',
+      image: require('../assets/onboarding1.png'),
+      likes: 10,
+      comments: 3,
+    },
+    {
+      id: '4',
+      username: 'JaneSmith',
+      timestamp: '2 jam yang lalu',
+      text: 'Ini adalah feed kedua. Ut enim ad minim veniam.',
+      image: require('../assets/onboarding1.png'),
+      likes: 10,
+      comments: 3,
+    },
+    {
+      id: '5',
+      username: 'JaneSmith',
+      timestamp: '2 jam yang lalu',
+      text: 'Ini adalah feed kedua. Ut enim ad minim veniam.',
+      image: require('../assets/onboarding1.png'),
+      likes: 10,
+      comments: 3,
     },
     // ... tambahkan data feed lainnya sesuai kebutuhan
   ];
@@ -47,8 +78,7 @@ const HomeScreen = () => {
         renderItem={({ item }) => <FeedItem item={item} />}
         style={tw`mt-40`}
       />
-      {/* Menggunakan PlusButton dan meneruskan fungsi onPress */}
-      <PlusButton onPress={() => {}} />
+      <PlusButton onPress={() => navigation.navigate('Publish')} />
     </View>
   );
 };
