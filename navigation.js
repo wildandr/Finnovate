@@ -10,7 +10,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import React from 'react';
 import HomeScreen from './src/screens/HomeScreen';
 import MarketScreen from './src/screens/Market/MarketScreen';
-import EducationScreen from './src/screens/EducationScreen';
+import EducationScreen from './src/screens/Education/EducationScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'; 
 import DetailEquity from './src/screens/Market/DetailEquity';
