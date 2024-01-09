@@ -1,23 +1,25 @@
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator, CardStyleInterpolators} from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+} from '@react-navigation/stack';
 import SplashScreen from './src/screens/SplashScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import React from 'react';
 import HomeScreen from './src/screens/HomeScreen';
 import MarketScreen from './src/screens/Market/MarketScreen';
 import EducationScreen from './src/screens/EducationScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
-import FontAwesome from 'react-native-vector-icons/FontAwesome'; 
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DetailEquity from './src/screens/Market/DetailEquity';
 import News from './src/screens/Market/News';
 import MarketTechnical from './src/screens/Market/MarketTechnical';
 import MarketFundamental from './src/screens/Market/MarketFundamental';
-import PublishScreen from './src/screens/PublishScreen';
 
 // Stack
 const Stack = createStackNavigator();
@@ -35,7 +37,6 @@ function StackGroup() {
       <Stack.Screen name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
   );
-
 }
 
 // Top Tabs
@@ -59,7 +60,7 @@ function MarketTopTabGroup() {
       <MarketTopTab.Screen name="Fundamental" component={MarketScreen} />
     </MarketTopTab.Navigator>
   );
-    }
+}
 
 // Market Stack
 const MarketStack = createStackNavigator();
@@ -138,20 +139,10 @@ const BottomTabNavigator = () => {
   );
 };
 
-
-
 export default function Navigation() {
   return (
     <NavigationContainer>
-     <BottomTabNavigator />
-      >
-        <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-        <Stack.Screen name="Publish" component={PublishScreen} />
-      </Stack.Navigator>
+      <BottomTabNavigator />
     </NavigationContainer>
   );
 }
