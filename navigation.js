@@ -22,6 +22,8 @@ import MarketTechnical from './src/screens/Market/MarketTechnical';
 import MarketFundamental from './src/screens/Market/MarketFundamental';
 import Course from './src/screens/Education/Course';
 import DetailCourse from './src/screens/Education/DetailCourse';
+import PublishScreen from './src/screens/PublishScreen';
+
 
 // Stack
 const Stack = createStackNavigator();
@@ -147,6 +149,22 @@ function MarketStackGroup() {
   );
 }
 
+// Home Stack
+const HomeStack = createStackNavigator();
+
+function HomeStackGroup() {
+  return (
+    <HomeStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      }}>
+      <HomeStack.Screen name="Home" component={HomeScreen} />
+      <HomeStack.Screen name="Publish" component={PublishScreen} />
+    </HomeStack.Navigator>
+  );
+}
+
 // Bottom Tab
 const Tab = createBottomTabNavigator();
 
@@ -166,7 +184,7 @@ const BottomTabNavigator = () => {
       }}>
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeStackGroup}
         options={{
           headerShown: false,
           tabBarIcon: ({color, size}) => (
