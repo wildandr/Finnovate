@@ -9,7 +9,7 @@ import EducationTopTab from '../../../EducationTopTab';
 const EducationScreen = () => {
   return (
     <SafeAreaView style={[tw`flex-1  `, { backgroundColor: '#002351' }]}>
-      <View style={[tw`px-4 `,]}>
+      <View style={[tw`px-4 mb-5`,]}>
         <View style={[tw` flex-row mt-7 items-center justify-between`,]}>
           <View style={[tw`flex-row`,]}>
             <Image source={require('../../assets/img1.jpg')} style={tw`w-14 h-14 rounded-full`} />
@@ -24,7 +24,9 @@ const EducationScreen = () => {
           Dive into the World of Smart Investing with <Text style={[tw``, { color: '#FFBC00' }]}>Finnovate!</Text>
         </Text>
       </View>
+    
       < EducationTopTab/>
+    
     </SafeAreaView>
   );
 };
