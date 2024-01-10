@@ -1,23 +1,25 @@
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator, CardStyleInterpolators} from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+} from '@react-navigation/stack';
 import SplashScreen from './src/screens/SplashScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import React from 'react';
 import HomeScreen from './src/screens/HomeScreen';
 import MarketScreen from './src/screens/Market/MarketScreen';
 import EducationScreen from './src/screens/Education/EducationScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
-import FontAwesome from 'react-native-vector-icons/FontAwesome'; 
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DetailEquity from './src/screens/Market/DetailEquity';
 import News from './src/screens/Market/News';
 import MarketTechnical from './src/screens/Market/MarketTechnical';
 import MarketFundamental from './src/screens/Market/MarketFundamental';
-
 
 // Stack
 const Stack = createStackNavigator();
@@ -35,11 +37,29 @@ function StackGroup() {
       <Stack.Screen name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
   );
-
 }
 
 // Top Tabs
 
+function MarketTopTabGroup() {
+  return (
+    <MarketTopTab.Navigator
+      tabBarOptions={{
+        activeTintColor: 'white',
+        inactiveTintColor: 'gray',
+        style: {
+          backgroundColor: '#00112B',
+        },
+        indicatorStyle: {
+          backgroundColor: 'white',
+        },
+      }}>
+      <MarketTopTab.Screen name="News" component={MarketScreen} />
+      <MarketTopTab.Screen name="Technical" component={MarketScreen} />
+      <MarketTopTab.Screen name="Fundamental" component={MarketScreen} />
+    </MarketTopTab.Navigator>
+  );
+}
 
 // Market Stack
 const MarketStack = createStackNavigator();
@@ -117,8 +137,6 @@ const BottomTabNavigator = () => {
     </Tab.Navigator>
   );
 };
-
-
 
 export default function Navigation() {
   return (
