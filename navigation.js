@@ -22,7 +22,7 @@ import MarketTechnical from './src/screens/Market/MarketTechnical';
 import MarketFundamental from './src/screens/Market/MarketFundamental';
 import Course from './src/screens/Education/Course';
 import DetailCourse from './src/screens/Education/DetailCourse';
-import EducationStackGroup from './EducationStackGroup';
+
 import PublishScreen from './src/screens/PublishScreen';
 
 
@@ -48,7 +48,24 @@ function StackGroup() {
 
 
 //Education Stack
+const EducationStack = createStackNavigator();
 
+
+
+function EducationStackGroup() {
+  return (
+    <EducationStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      }}
+    >
+      <EducationStack.Screen name="EducationScreen" component={EducationScreen} />
+    
+      <EducationStack.Screen name="DetailCourse" component={DetailCourse} />
+    </EducationStack.Navigator>
+  );
+}
 
 // Market Stack
 const MarketStack = createStackNavigator();
