@@ -1,11 +1,9 @@
 // App.tsx
 import React from 'react';
-import OnboardingScreen from './src/screens/OnboardingScreen';
+import { NavigationContainer } from '@react-navigation/native';
 import Navigation from './navigation';
-import RegisterScreen from './src/screens/RegisterScreen';
 
 const App = () => {
-  // return <RegisterScreen />;
   return <Navigation />;
 };
 

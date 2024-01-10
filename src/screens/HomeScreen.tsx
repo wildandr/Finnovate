@@ -1,22 +1,55 @@
-import React from 'react';
-import {View, Text, Image, TextInput} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import FeedItem from '../components/FeedItem';
+import PlusButton from '../components/PlusButton';
+import {useNavigation} from '@react-navigation/native';
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
+  const [feedData, setFeedData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch('http://10.0.2.2:3001/posts');
+      const data = await response.json();
+      const sortedData = data.sort(
+        (a, b) => new Date(b.date_created) - new Date(a.date_created),
+      );
+      setFeedData(sortedData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchData();
+  }, [fetchData]);
   return (
-    <View
-      style={[
-        tw`flex-1 justify-center items-center`,
-        {backgroundColor: '#002351'},
-      ]}>
+    <View style={[tw`flex-1`, {backgroundColor: '#002351'}]}>
       <View
         style={tw`flex-row justify-between items-center absolute w-full px-5 top-5`}>
         <Image source={require('../assets/Finnovate_logo_top.png')} />
         <View style={tw`flex-row`}>
           <Icon name="bell-o" size={24} color="white" style={tw`mr-3`} />
-          <AntDesign name="setting" size={24} color="white" />
+          <Icon name="cog" size={24} color="white" />
         </View>
       </View>
       <View
@@ -31,7 +64,17 @@ const HomeScreen = () => {
           placeholderTextColor="white"
         />
       </View>
-      <Text style={tw`text-white`}>Home Screen</Text>
+
+      <FlatList
+        data={feedData}
+        keyExtractor={item => item.post_id.toString()}
+        renderItem={({item}) => <FeedItem item={item} />}
+        style={tw`mt-40`}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
+      <PlusButton onPress={() => navigation.navigate('Publish')} />
     </View>
   );
 };

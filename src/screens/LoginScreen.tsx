@@ -18,9 +18,12 @@ const LoginScreen: React.FC = () => {
             <TouchableOpacity onPress={() => navigation.navigate('ResetPassword')} style={{ alignSelf: 'flex-end' }}>
                 <Text style={[tw`text-right`, { color: '#FFBC00', fontSize: 12 }]}>Forgot your password?</Text>
             </TouchableOpacity>
-            <View style={{ marginTop: 20 }}>
+            <TouchableOpacity 
+                style={{marginTop: 20}}
+                onPress={() => navigation.navigate('BottomTabNavigator')}
+            >
                 <LoginButton />
-            </View>
+            </TouchableOpacity>
             <View style={tw`my-5`}>
                 <Image source={require('../assets/Or.png')} style={{ alignSelf: 'center' }} />
             </View>
