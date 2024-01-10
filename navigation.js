@@ -17,7 +17,8 @@ import DetailEquity from './src/screens/Market/DetailEquity';
 import News from './src/screens/Market/News';
 import MarketTechnical from './src/screens/Market/MarketTechnical';
 import MarketFundamental from './src/screens/Market/MarketFundamental';
-
+import Course from './src/screens/Education/Course';
+import DetailCourse from './src/screens/Education/DetailCourse';
 
 // Stack
 const Stack = createStackNavigator();
@@ -40,6 +41,93 @@ function StackGroup() {
 
 // Top Tabs
 
+//Education Top Tabs
+const EducationTab = createMaterialTopTabNavigator();
+
+const CustomTabLabel = ({ label, focused, color, style, fontSize }) => (
+  <Text style={[style, { color, textTransform: 'none', fontSize }]}>{label}</Text>
+);
+
+const EducationTopTabs = () => {
+  return (
+    <EducationTab.Navigator
+      tabBarOptions={{
+        activeTintColor: 'white',
+        inactiveTintColor: 'white',
+        indicatorStyle: {
+          height: null,
+          top: '10%',
+          bottom: '10%',
+          width: '20%',
+          left: '2.5%',
+          borderRadius: 10,
+          backgroundColor: '#2A476E',
+        },
+        style: {
+          width: '100%',
+          borderRadius: 1,
+          backgroundColor: "#002351",
+          elevation: 0,
+        },
+        tabStyle: {
+          borderRadius: 10,
+        },
+      }}>
+      <EducationTab.Screen
+        name="Discover"
+        component={Course}
+        options={{
+          tabBarLabel: ({ focused, color }) => (
+            <CustomTabLabel label="Discover" focused={focused} color={color} style={[tw``,]} fontSize={14} />
+          ),
+        }}
+      />
+      <EducationTab.Screen
+        name="Beginner"
+        component={Course}
+        options={{
+          tabBarLabel: ({ focused, color }) => (
+            <CustomTabLabel label="Beginner" focused={focused} color={color} style={[tw``]} fontSize={14} />
+          ),
+        }}
+      />
+      <EducationTab.Screen
+        name="Moderate"
+        component={Course}
+        options={{
+          tabBarLabel: ({ focused, color }) => (
+            <CustomTabLabel label="Moderate" focused={focused} color={color} style={[tw``]} fontSize={14} />
+          ),
+        }}
+      />
+      <EducationTab.Screen
+        name="Advanced"
+        component={Course}
+        options={{
+          tabBarLabel: ({ focused, color }) => (
+            <CustomTabLabel label="Advanced" focused={focused} color={color} style={[tw``]} fontSize={14} />
+          ),
+        }}
+      />
+    </EducationTab.Navigator>
+  );
+}
+
+//Education Stack
+const EducationStack = createStackNavigator();
+
+function EducationStackGroup() {
+  return (
+    <EducationStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      }}>
+      <EducationStack.Screen name="EducationScreen" component={EducationScreen} />
+      <EducationStack.Screen name="DetailCourse" component={DetailCourse} />
+    </EducationStack.Navigator>
+  );
+}
 
 // Market Stack
 const MarketStack = createStackNavigator();
@@ -96,7 +184,7 @@ const BottomTabNavigator = () => {
       />
       <Tab.Screen
         name="Education"
-        component={EducationScreen}
+        component={EducationStackGroup}
         options={{
           headerShown: false,
           tabBarIcon: ({color, size}) => (
