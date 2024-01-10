@@ -1,17 +1,20 @@
-// TabNavigation.js
 import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import { Text } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import Course from './src/screens/Education/Course';
+import DetailCourse from './src/screens/Education/DetailCourse';
+import EducationScreen from './src/screens/Education/EducationScreen';
+
+const EducationStack = createStackNavigator();
 
 const Tab = createMaterialTopTabNavigator();
-
 const CustomTabLabel = ({ label, focused, color, style, fontSize }) => (
   <Text style={[style, { color, textTransform: 'none', fontSize }]}>{label}</Text>
 );
 
-const EducationTopTab = () => (
+const TabNavigator = () => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
       tabBarActiveTintColor: 'white',
@@ -74,4 +77,19 @@ const EducationTopTab = () => (
   </Tab.Navigator>
 );
 
-export default EducationTopTab;
+function EducationStackGroup() {
+  return (
+    <EducationStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      }}
+    >
+      <EducationStack.Screen name="EducationScreen" component={EducationScreen} />
+    
+      <EducationStack.Screen name="DetailCourse" component={DetailCourse} />
+    </EducationStack.Navigator>
+  );
+}
+
+export default EducationStackGroup;
