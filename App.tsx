@@ -4,12 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import Navigation from './navigation';
 
 const App = () => {
-  return (
-  
-      <Navigation />
-     
-   
-  );
+  return <Navigation />;
 };
 
 export default App;
