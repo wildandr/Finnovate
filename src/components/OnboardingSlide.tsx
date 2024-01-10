@@ -24,6 +24,7 @@ const OnboardingSlide: React.FC<OnboardingSlideProps> = ({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 105,
+    paddingHorizontal: 20,
   },
   text: {
     fontFamily: 'Inter-Regular',

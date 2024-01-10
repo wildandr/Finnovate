@@ -11,6 +11,12 @@ const connection = mysql.createPool({
 
 const app = express();
 
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended: false}));
+
+// parse application/json
+app.use(bodyParser.json());
+
 app.get('/posts', function (req, res) {
   connection.getConnection(function (err, connection) {
     if (err) {
@@ -76,7 +82,6 @@ app.post('/new-post', bodyParser.json(), function (req, res) {
     const date_created = new Date();
     const date_updated = date_created;
 
-    // Jika post_url atau image_path tidak didefinisikan, tetapkan ke null
     post_url = post_url || null;
     image_path = image_path || null;
 
@@ -100,6 +105,52 @@ app.post('/new-post', bodyParser.json(), function (req, res) {
       },
     );
   });
+});
+
+// GET route for likes
+app.get('/likes', function (req, res) {
+  connection.query('SELECT * FROM Likes', (error, results) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send('An error occurred while fetching likes');
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+// POST route for likes
+app.post('/likes/create', function (req, res) {
+  const {user_id, post_id} = req.body;
+  connection.query(
+    'INSERT INTO Likes (user_id, post_id, date_created) VALUES (?, ?, NOW())',
+    [user_id, post_id],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while creating a like');
+      } else {
+        res.status(200).send('Like created successfully');
+      }
+    },
+  );
+});
+
+// DELETE route for likes
+app.delete('/likes/delete', function (req, res) {
+  const {user_id, post_id} = req.body;
+  connection.query(
+    'DELETE FROM Likes WHERE user_id = ? AND post_id = ?',
+    [user_id, post_id],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while deleting a like');
+      } else {
+        res.status(200).send('Like deleted successfully');
+      }
+    },
+  );
 });
 
 app.listen(3001, () => {

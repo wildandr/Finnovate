@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, Text, Image} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, Image, TouchableOpacity} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Fontisto from 'react-native-vector-icons/Fontisto';
@@ -24,53 +24,93 @@ function formatTimestamp(timestamp) {
   }
 }
 
-const FeedItem = ({item}: {item: any}) => (
-  <View>
-    <View style={[tw`p-4 rounded-md ml-4`, {backgroundColor: '#002351'}]}>
-      <View style={tw`flex-row`}>
-        <Icon name="user-circle" size={36} color="white" style={tw`mr-2`} />
-        <View style={tw`ml-2`}>
-          <Text style={tw`font-bold text-white`}>{item.username}</Text>
-          <Text style={tw`text-white`}>
-            {formatTimestamp(item.date_created)}
-          </Text>
-        </View>
-        <Entypo
-          name="dots-three-vertical"
-          size={16}
-          color="white"
-          style={tw`ml-auto`}
-        />
-      </View>
-      <Text style={tw`text-white my-3`}>{item.caption}</Text>
-      {item.image_path && (
-        <View
-          style={{
-            width: 200,
-            height: 200,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image
-            source={{uri: item.image_path}}
-            resizeMode="cover"
-            style={{width: '100%', height: '100%'}}
+const FeedItem = ({item}: {item: any}) => {
+  const [isLiked, setIsLiked] = useState(false);
+  const [likes, setLikes] = useState(item.likes);
+
+  useEffect(() => {
+    const fetchLikes = async () => {
+      const response = await fetch('http://10.0.2.2:3001/likes');
+      const likes = await response.json();
+      const userLike = likes.find(
+        (like: any) => like.user_id === 1 && like.post_id === item.post_id,
+      );
+      setIsLiked(!!userLike);
+    };
+
+    fetchLikes();
+  }, [item]);
+
+  const handleLike = async () => {
+    const url = isLiked
+      ? 'http://10.0.2.2:3001/likes/delete'
+      : 'http://10.0.2.2:3001/likes/create';
+    const method = isLiked ? 'DELETE' : 'POST';
+    const body = JSON.stringify({user_id: 1, post_id: item.post_id});
+
+    await fetch(url, {
+      method,
+      body,
+      headers: {'Content-Type': 'application/json'},
+    });
+    setIsLiked(!isLiked);
+    setLikes(likes + (isLiked ? -1 : 1));
+  };
+
+  return (
+    <View>
+      <View style={[tw`p-4 rounded-md ml-4`, {backgroundColor: '#002351'}]}>
+        <View style={tw`flex-row`}>
+          <Icon name="user-circle" size={36} color="white" style={tw`mr-2`} />
+          <View style={tw`ml-2`}>
+            <Text style={tw`font-bold text-white`}>{item.username}</Text>
+            <Text style={tw`text-white`}>
+              {formatTimestamp(item.date_created)}
+            </Text>
+          </View>
+          <Entypo
+            name="dots-three-vertical"
+            size={16}
+            color="white"
+            style={tw`ml-auto`}
           />
         </View>
-      )}
-      <View style={tw`flex-row`}>
-        <View style={tw`flex-row items-center mr-4`}>
-          <Icon name="heart-o" size={16} color="white" />
-          <Text style={tw`text-white ml-2`}>{item.likes}</Text>
-        </View>
-        <View style={tw`flex-row items-center`}>
-          <Fontisto name="comment" size={16} color="white" />
-          <Text style={tw`text-white ml-2`}>{item.comments}</Text>
+        <Text style={tw`text-white my-3`}>{item.caption}</Text>
+        {item.image_path && (
+          <View
+            style={{
+              width: 200,
+              height: 200,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              source={{uri: item.image_path}}
+              resizeMode="cover"
+              style={{width: '100%', height: '100%'}}
+            />
+          </View>
+        )}
+        <View style={tw`flex-row`}>
+          <View style={tw`flex-row items-center mr-4`}>
+            <TouchableOpacity onPress={handleLike}>
+              <Icon
+                name={isLiked ? 'heart' : 'heart-o'}
+                size={16}
+                color="white"
+              />
+            </TouchableOpacity>
+            <Text style={tw`text-white ml-2`}>{likes}</Text>
+          </View>
+          <View style={tw`flex-row items-center`}>
+            <Fontisto name="comment" size={16} color="white" />
+            <Text style={tw`text-white ml-2`}>{item.comments}</Text>
+          </View>
         </View>
       </View>
+      <View style={{height: 1, backgroundColor: '#001736'}} />
     </View>
-    <View style={{height: 1, backgroundColor: '#001736'}} />
-  </View>
-);
+  );
+};
 
 export default FeedItem;
