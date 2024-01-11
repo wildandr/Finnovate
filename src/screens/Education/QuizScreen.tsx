@@ -4,6 +4,8 @@ import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Modal from 'react-native-modal';
 import { useNavigation } from '@react-navigation/native';
+import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
+
 
 // Importing the questions array
 import { questions } from '../../data/question';
@@ -25,8 +27,8 @@ const QuizScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState<ModalType>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const currentQuestion = questions[currentQuestionIndex];
- 
-
+  const [isPlaying, setIsPlaying] = useState(true);
+  const progressPercentage = Math.floor((currentQuestionIndex / questions.length) * 100);
 
   const startTimer = () => {
     setTimer(15); // Set ulang timer menjadi 15 detik
@@ -58,18 +60,18 @@ const stopTimer = () => {
     setIsCorrect(false);
     setIsExplanationVisible(false);
     setIsModalVisible(null);
-  
-   startTimer();
+
+    startTimer();
     // Increment the current question index
     const nextQuestionIndex = currentQuestionIndex + 1;
-  
+
     // Check if there are more questions
     if (nextQuestionIndex < questions.length) {
       // Move to the next question
       setCurrentQuestionIndex(nextQuestionIndex);
     } else {
-      // No more questions, you can handle the end of the quiz here
-      console.log("End of the quiz");
+      // No more questions, navigate to QuizResult screen
+      navigation.navigate('QuizResult');
     }
   };
   
@@ -176,20 +178,37 @@ const stopTimer = () => {
   }, [currentQuestionIndex]); // Re-run the effect when currentQuestionIndex changes
 
   return (
-    <View style={[tw`h-full`, { backgroundColor: '#FFFFFF' }]}>
+    <View style={[tw`h-full flex`, { backgroundColor: '#FFFFFF' }]}>
       <View style={[tw`px-4 flex-row mt-4 items-center pb-2`]}>
         <TouchableOpacity onPress={handleGoBack}>
           <Icon name="times" size={24} style={tw`text-black`} />
         </TouchableOpacity>
+        <View
+        style={[tw`w-full ml-2 flex-row items-center h-10 rounded-lg justify-center `,{
+          backgroundColor: 'white',
+        }]}
+      >
+        <Text
+          style={[tw``,{
+            backgroundColor: '#FFBC00',
+            borderRadius: 12,
+            position: 'absolute',
+            left: 0,
+            height: 10,
+            right: 0,
+            width: `${progressPercentage}%`,
+          }]}
+        />
+      </View>
       </View>
       <Text style={[tw`px-4 text-black font-bold mb-2`, { fontSize: 20 }]}>
         {currentQuestion.question}
       </Text>
-      <View style={[tw`w-full px-4`]}>
+      <View style={[tw`w-full  flex items-center px-4`]}>
         {/* Display the image */}
         <Image
           source={{ uri: currentQuestion.image }}
-          style={tw`w-full border border-gray-700 h-48 mt-5 mb-5`}
+          style={tw`w-full border border-gray-700 h-48 mt-5 mb-3`}
         />
       </View>
       {/* Changable View */}
@@ -209,7 +228,7 @@ const stopTimer = () => {
               style={[
                 tw`text-black border border-b-4 border-r-2 border-l-2 p-3 rounded-md mb-3`,
                 {
-                  fontSize: 16,
+                  fontSize: 18,
                   borderColor:
                     selectedOptionId === index
                       ? isCorrect
@@ -225,9 +244,25 @@ const stopTimer = () => {
 
       {/* Conditionally render the timer */}
       {!isExplanationVisible && (
-        <Text style={[tw`text-black mt-2`, { fontSize: 16 }]}>
-          Time remaining: {timer} seconds
-        </Text>
+        <View style={[tw` px-4 absolute bottom-7 right-0`]}>
+        <CountdownCircleTimer
+        isPlaying={isPlaying}
+        duration={15}
+        size={60}
+        trailColor="#FFFFFF"
+        strokeWidth={6}
+        colors={["#ffd04d", "#ffc933", "#ffc31a", "#FFBC00"]}
+        colorsTime={[10, 6, 3, 0]}
+        onComplete={() => ({ shouldRepeat: true, delay: 2 })}
+        updateInterval={1}
+      >
+        {({ remainingTime, color }) => (
+          <Text style={[tw``, { fontSize: 16, color }]}>
+            {remainingTime} 
+          </Text>
+        )}
+      </CountdownCircleTimer>
+      </View>
       )}
 
       {isModalVisible === 'correctModal' && <CorrectModal />}

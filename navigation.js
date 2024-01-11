@@ -26,6 +26,7 @@ import DetailCourse from './src/screens/Education/DetailCourse';
 import PublishScreen from './src/screens/PublishScreen';
 import CourseContent from './src/screens/Education/CourseContent';
 import QuizScreen from './src/screens/Education/QuizScreen';
+import QuizResult from './src/screens/Education/QuizResult';
 
 
 // Stack
@@ -66,6 +67,7 @@ function EducationStackGroup() {
       <EducationStack.Screen name="DetailCourse" component={DetailCourse} />
       <EducationStack.Screen name="CourseContent" component={CourseContent} />
       <EducationStack.Screen name="QuizScreen" component={QuizScreen} />
+      <EducationStack.Screen name="QuizResult" component={QuizResult} />
     </EducationStack.Navigator>
   );
 }
