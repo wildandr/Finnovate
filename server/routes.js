@@ -11,6 +11,8 @@ const connection = mysql.createPool({
 
 const app = express();
 
+const bcrypt = require('bcrypt');
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}));
 
@@ -148,6 +150,57 @@ app.delete('/likes/delete', function (req, res) {
         res.status(500).send('An error occurred while deleting a like');
       } else {
         res.status(200).send('Like deleted successfully');
+      }
+    },
+  );
+});
+
+// POST route for registering a new user
+app.post('/users/register', async function (req, res) {
+  const {name, email, username, password} = req.body;
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  connection.query(
+    'INSERT INTO Users (full_name, email, username, password, date_created) VALUES (?, ?, ?, ?, NOW())',
+    [name, email, username, hashedPassword],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while registering a new user');
+      } else {
+        res.status(200).send('User registered successfully');
+      }
+    },
+  );
+});
+
+// POST route for logging in a user
+app.post('/users/login', async function (req, res) {
+  const {email, password} = req.body;
+
+  connection.query(
+    'SELECT * FROM Users WHERE email = ?',
+    [email],
+    async (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while logging in');
+      } else {
+        if (results.length > 0) {
+          const comparison = await bcrypt.compare(
+            password,
+            results[0].password,
+          );
+
+          if (comparison) {
+            res.status(200).send('User logged in successfully');
+          } else {
+            res.status(401).send('Wrong password');
+          }
+        } else {
+          res.status(404).send('User not found');
+        }
       }
     },
   );

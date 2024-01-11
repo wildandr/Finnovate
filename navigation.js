@@ -10,7 +10,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import HomeScreen from './src/screens/HomeScreen';
 import MarketScreen from './src/screens/Market/MarketScreen';
 import EducationScreen from './src/screens/Education/EducationScreen';
@@ -25,9 +25,22 @@ import DetailCourse from './src/screens/Education/DetailCourse';
 
 import PublishScreen from './src/screens/PublishScreen';
 import CourseContent from './src/screens/Education/CourseContent';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import QuizScreen from './src/screens/Education/QuizScreen';
 import QuizResult from './src/screens/Education/QuizResult';
 
+
+const RootStack = createStackNavigator();
+
+const RootStackScreen = () => (
+  <RootStack.Navigator headerMode="none">
+    <RootStack.Screen name="Splash" component={SplashScreen} />
+    <RootStack.Screen name="OnBoarding" component={OnboardingScreen} />
+    <RootStack.Screen name="Register" component={RegisterScreen} />
+    <RootStack.Screen name="Login" component={LoginScreen} />
+    <RootStack.Screen name="Home" component={BottomTabNavigator} />
+  </RootStack.Navigator>
+);
 
 // Stack
 const Stack = createStackNavigator();
@@ -49,11 +62,8 @@ function StackGroup() {
 
 // Top Tabs
 
-
 //Education Stack
 const EducationStack = createStackNavigator();
-
-
 
 function EducationStackGroup() {
   return (
@@ -61,9 +71,11 @@ function EducationStackGroup() {
       screenOptions={{
         headerShown: false,
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
-      }}
-    >
-      <EducationStack.Screen name="EducationScreen" component={EducationScreen} />
+      }}>
+      <EducationStack.Screen
+        name="EducationScreen"
+        component={EducationScreen}
+      />
       <EducationStack.Screen name="DetailCourse" component={DetailCourse} />
       <EducationStack.Screen name="CourseContent" component={CourseContent} />
       <EducationStack.Screen name="QuizScreen" component={QuizScreen} />
@@ -83,7 +95,11 @@ function MarketStackGroup() {
         cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
       }}>
       <MarketStack.Screen name="MarketScreen" component={MarketScreen} />
-      <MarketStack.Screen name="DetailEquity" component={DetailEquity} options={{presentation: "fullScreenModal"}} />
+      <MarketStack.Screen
+        name="DetailEquity"
+        component={DetailEquity}
+        options={{presentation: 'fullScreenModal'}}
+      />
     </MarketStack.Navigator>
   );
 }
@@ -166,9 +182,35 @@ const BottomTabNavigator = () => {
 };
 
 export default function Navigation() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedin, setIsLoggedin] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
+      setIsLoggedin(isLoggedIn === 'true');
+      setIsLoading(false);
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  const logout = async () => {
+    await AsyncStorage.removeItem('isLoggedIn');
+    setIsLoggedin(false);
+  };
+
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <NavigationContainer>
-     <BottomTabNavigator />
+      {isLoggedin ? (
+        <BottomTabNavigator logout={logout} />
+      ) : (
+        <RootStackScreen />
+      )}
     </NavigationContainer>
   );
 }
