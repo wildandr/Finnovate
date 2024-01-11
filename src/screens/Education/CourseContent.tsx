@@ -12,6 +12,10 @@ const CourseContent = () => {
     navigation.goBack();
   };
 
+  const handlePress = () => {
+    navigation.navigate('QuizScreen');
+  };
+
   return (
     <View style={[tw`h-full py-2`, {backgroundColor: '#FFFFFF'}]}>
       <ScrollView>
@@ -37,7 +41,7 @@ const CourseContent = () => {
             diverse participants that shape its dynamics.
           </Text>
         </View>
-        <TouchableOpacity onPress={handleGoBack}>
+        <TouchableOpacity onPress={handlePress}>
           <Text
             style={[
               tw`text-white rounded-md font-semibold text-center mb-2 mt-2 py-2 px-5 mx-auto`,
@@ -50,24 +54,20 @@ const CourseContent = () => {
           <Text style={[tw`text-black font-semibold  mb-2 `, {fontSize: 24}]}>
             Key Components of the Stock Market
           </Text>
-          <FlatList
-            data={[
-              {
-                key: 'Stock Exchanges: Explore the significance of stock exchanges as the primary platforms where buyers and sellers come together to trade stocks, and how they contribute to market transparency and liquidity.',
-              },
-              {
-                key: 'Listed Companies: Understand the role of companies listed on the stock exchange, the process of going public through an Initial Public Offering (IPO), and the ongoing responsibilities of being a publicly traded entity.',
-              },
-              {
-                key: 'Investors: Analyze the diverse range of participants in the stock market, from individual retail investors to institutional investors, and understand how their motivations and strategies influence market movements.',
-              },
-            ]}
-            renderItem={({item, index}) => (
-              <Text style={[tw`text-black  mb-2`, {fontSize: 14}]}>
-                {index + 1}. {item.key}
-              </Text>
-            )}
-          />
+          <Text style={[tw`text-black   mb-2 `, {fontSize: 14}]}>
+            1.Stock Exchanges: Explore the significance of stock exchanges as the
+            primary platforms where buyers and sellers come together to trade
+            stocks, and how they contribute to market transparency and
+            liquidity.{'\n'}{'\n'}
+            2.Listed Companies: Understand the role of companies listed
+            on the stock exchange, the process of going public through an
+            Initial Public Offering (IPO), and the ongoing responsibilities of
+            being a publicly traded entity.{'\n'}{'\n'}
+            3.Investors: Analyze the diverse range
+            of participants in the stock market, from individual retail
+            investors to institutional investors, and understand how their
+            motivations and strategies influence market movements.
+          </Text>
         </View>
         <View style={[tw`px-4 mt-5  `]}>
           <Text
@@ -85,7 +85,7 @@ const CourseContent = () => {
             exploring! 🌟
           </Text>
         </View>
-        <TouchableOpacity onPress={handleGoBack}>
+        <TouchableOpacity onPress={handlePress}>
           <Text
             style={[
               tw`text-white rounded-md font-semibold text-center mb-2 mt-2 py-2 px-5 mx-auto`,
