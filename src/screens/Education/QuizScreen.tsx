@@ -19,12 +19,12 @@ const QuizScreen = () => {
     navigation.goBack();
   };
 
-  const [timer, setTimer] = useState(15); // Timer awal 15 detik
+  const [timer, setTimer] = useState<number | null>(15); // Timer awal 15 detik
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
   const [selectedOptionId, setSelectedOptionId] = useState<number | null>(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [isExplanationVisible, setIsExplanationVisible] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState<ModalType>(null);
+  const [isModalVisible, setIsModalVisible] = useState<ModalType | false>(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const currentQuestion = questions[currentQuestionIndex];
   const [isPlaying, setIsPlaying] = useState(true);
@@ -54,26 +54,31 @@ const stopTimer = () => {
    
   };
   
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     // Reset states for the next question
     setSelectedOptionId(null);
     setIsCorrect(false);
     setIsExplanationVisible(false);
-    setIsModalVisible(null);
-
-    startTimer();
+    setIsModalVisible(false); // Ensure modal is hidden before navigation
+  
     // Increment the current question index
     const nextQuestionIndex = currentQuestionIndex + 1;
-
+  
     // Check if there are more questions
     if (nextQuestionIndex < questions.length) {
       // Move to the next question
       setCurrentQuestionIndex(nextQuestionIndex);
-    } else {
-      // No more questions, navigate to QuizResult screen
-      navigation.navigate('QuizResult');
+      stopTimer(); // Stop the timer before starting a new one
+      startTimer();
+    } else if (nextQuestionIndex === questions.length) {
+       setTimer(null);
+      stopTimer(); // Stop the timer before navigation
+      navigation.navigate('QuizResult'); // Wait for navigation to complete
+      // No more questions, don't show any modal
     }
   };
+  
+
   
 
   const closeModal = () => {
@@ -146,7 +151,7 @@ const stopTimer = () => {
   useEffect(() => {
     const myInterval = () => {
       setTimer((prevTimer) => {
-        if (prevTimer > 0 && !isExplanationVisible) {
+        if (prevTimer !== null && prevTimer > 0 && !isExplanationVisible) {
           // If timer is greater than 0 and explanation is not visible
           return prevTimer - 1;
         } else {
@@ -154,21 +159,32 @@ const stopTimer = () => {
             // If the explanation is visible, stop the timer
             stopTimer();
             return prevTimer;
+          } else {
+            setIsExplanationVisible(true);
+            setIsModalVisible('outOfTimeModal');
+            return 15; // Reset the timer to 15 when it reaches 0
           }
-          setIsExplanationVisible(true);
-          setIsModalVisible('outOfTimeModal');
-          return 15; // Reset the timer to 15 when it reaches 0
         }
       });
     };
   
+    const nextQuestionIndex = currentQuestionIndex + 1;
     const timerInterval = setInterval(myInterval, 1000);
+    // Check if it's the last question
+    if (nextQuestionIndex === questions.length) {
+      return clearInterval(timerInterval);
+    
+    }
+  
+    
   
     // Clean up
     return () => {
       clearInterval(timerInterval);
+      stopTimer();
     };
   }, [timer, isExplanationVisible]);
+  
   
   
 
@@ -268,6 +284,7 @@ const stopTimer = () => {
       {isModalVisible === 'correctModal' && <CorrectModal />}
       {isModalVisible === 'incorrectModal' && <IncorrectModal />}
       {isModalVisible === 'outOfTimeModal' && <OutOfTimeModal />}
+
     </View>
   );
 };
