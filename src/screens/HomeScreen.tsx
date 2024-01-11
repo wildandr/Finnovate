@@ -1,82 +1,78 @@
-import React from 'react';
-import { View, Text, Image, TextInput, FlatList, TouchableOpacity } from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FeedItem from '../components/FeedItem';
 import PlusButton from '../components/PlusButton';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const feedData = [
-    {
-      id: '1',
-      username: 'JohnDoe',
-      timestamp: '1 jam yang lalu',
-      text: 'Ini adalah feed pertama. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      image: require('../assets/onboarding1.png'),
-      likes: 10,
-      comments: 3,
-    },
-    {
-      id: '2',
-      username: 'JaneSmith',
-      timestamp: '2 jam yang lalu',
-      text: 'Ini adalah feed kedua. Ut enim ad minim veniam.',
-      image: require('../assets/onboarding1.png'),
-      likes: 10,
-      comments: 3,
-    },
-    {
-      id: '3',
-      username: 'JaneSmith',
-      timestamp: '2 jam yang lalu',
-      text: 'Ini adalah feed kedua. Ut enim ad minim veniam.',
-      image: require('../assets/onboarding1.png'),
-      likes: 10,
-      comments: 3,
-    },
-    {
-      id: '4',
-      username: 'JaneSmith',
-      timestamp: '2 jam yang lalu',
-      text: 'Ini adalah feed kedua. Ut enim ad minim veniam.',
-      image: require('../assets/onboarding1.png'),
-      likes: 10,
-      comments: 3,
-    },
-    {
-      id: '5',
-      username: 'JaneSmith',
-      timestamp: '2 jam yang lalu',
-      text: 'Ini adalah feed kedua. Ut enim ad minim veniam.',
-      image: require('../assets/onboarding1.png'),
-      likes: 10,
-      comments: 3,
-    },
-    // ... tambahkan data feed lainnya sesuai kebutuhan
-  ];
+  const [feedData, setFeedData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
+  useEffect(() => {
+    fetchData();
+  }, []);
 
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch('http://10.0.2.2:3001/posts');
+      const data = await response.json();
+      const sortedData = data.sort(
+        (a, b) => new Date(b.date_created) - new Date(a.date_created),
+      );
+      setFeedData(sortedData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchData();
+  }, [fetchData]);
   return (
-    <View style={[tw`flex-1`, { backgroundColor: '#002351' }]}>
-      <View style={tw`flex-row justify-between items-center absolute w-full px-5 top-5`}>
+    <View style={[tw`flex-1`, {backgroundColor: '#002351'}]}>
+      <View
+        style={tw`flex-row justify-between items-center absolute w-full px-5 top-5`}>
         <Image source={require('../assets/Finnovate_logo_top.png')} />
         <View style={tw`flex-row`}>
           <Icon name="bell-o" size={24} color="white" style={tw`mr-3`} />
           <Icon name="cog" size={24} color="white" />
         </View>
       </View>
-      <View style={[tw`absolute top-20 rounded-lg px-2 flex-row items-center mx-5`, { backgroundColor: '#00112B' }]}>
+      <View
+        style={[
+          tw`absolute top-20 rounded-lg px-2 flex-row items-center mx-5`,
+          {backgroundColor: '#00112B'},
+        ]}>
         <Icon name="search" size={20} color="white" style={tw`left-1`} />
-        <TextInput style={[tw`flex-1`, { color: 'white', paddingLeft: 20 }]} placeholder=" Search feeds, trend" placeholderTextColor="white" />
+        <TextInput
+          style={[tw`flex-1`, {color: 'white', paddingLeft: 20}]}
+          placeholder=" Search feeds, trend"
+          placeholderTextColor="white"
+        />
       </View>
 
       <FlatList
         data={feedData}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <FeedItem item={item} />}
+        keyExtractor={item => item.post_id.toString()}
+        renderItem={({item}) => <FeedItem item={item} />}
         style={tw`mt-40`}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
       <PlusButton onPress={() => navigation.navigate('Publish')} />
     </View>
