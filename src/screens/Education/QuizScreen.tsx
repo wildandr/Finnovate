@@ -3,17 +3,33 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Modal from 'react-native-modal';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 
 
 // Importing the questions array
 import { questions } from '../../data/question';
+import { StackNavigationProp } from '@react-navigation/stack';
+type RootStackParamList = {
+    QuizResult: {
+      correctAnswers: number;
+      timeTaken: number;
+    };
+    // ... other screen definitions
+  };
+  
+  type QuizResultScreenRouteProp = RouteProp<RootStackParamList, 'QuizResult'>;
+  type QuizResultScreenNavigationProp = StackNavigationProp<RootStackParamList, 'QuizResult'>;
+  
+  type Props = {
+    route: QuizResultScreenRouteProp;
+    navigation: QuizResultScreenNavigationProp;
+  };
 
 type ModalType = 'correctModal' | 'incorrectModal' | 'outOfTimeModal' | null;
 
-const QuizScreen = () => {
-  const navigation = useNavigation();
+const QuizScreen: React.FC<Props> = ({ route, navigation }) => {
+
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -29,10 +45,11 @@ const QuizScreen = () => {
   const currentQuestion = questions[currentQuestionIndex];
   const [isPlaying, setIsPlaying] = useState(true);
   const progressPercentage = Math.floor((currentQuestionIndex / questions.length) * 100);
-
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
+  const [startTime, setStartTime] = useState(0);
   const startTimer = () => {
     setTimer(15); // Set ulang timer menjadi 15 detik
-  
+    
   };
 
  
@@ -45,41 +62,47 @@ const stopTimer = () => {
 
   const handleOptionPress = (optionId: number) => {
     setSelectedOptionId(optionId);
-  
+
     const correctAnswerIndex = currentQuestion.correctAnswerIndex;
     const correct = optionId === correctAnswerIndex;
     setIsCorrect(correct);
     setIsExplanationVisible(true);
     setIsModalVisible(correct ? 'correctModal' : 'incorrectModal');
-   
+
+    if (correct) {
+      setCorrectAnswersCount((count) => count + 1); // Increment jumlah jawaban benar
+    }
   };
+
   
   const handleNextQuestion = async () => {
-    // Reset states for the next question
     setSelectedOptionId(null);
     setIsCorrect(false);
     setIsExplanationVisible(false);
-    setIsModalVisible(false); // Ensure modal is hidden before navigation
-  
-    // Increment the current question index
+    setIsModalVisible(false);
+
     const nextQuestionIndex = currentQuestionIndex + 1;
-  
-    // Check if there are more questions
+
     if (nextQuestionIndex < questions.length) {
-      // Move to the next question
       setCurrentQuestionIndex(nextQuestionIndex);
-      stopTimer(); // Stop the timer before starting a new one
+      stopTimer();
       startTimer();
     } else if (nextQuestionIndex === questions.length) {
-       setTimer(null);
-      stopTimer(); // Stop the timer before navigation
-      navigation.navigate('QuizResult'); // Wait for navigation to complete
-      // No more questions, don't show any modal
+      setTimer(null);
+      stopTimer();
+
+      // Mengirim data ke QuizResult
+      navigation.navigate('QuizResult', {
+        correctAnswers: correctAnswersCount,
+        timeTaken: calculateTimeTaken(),
+      });
     }
   };
-  
 
-  
+  const calculateTimeTaken = () => {
+    // Hitung selisih waktu sekarang dengan waktu mulai pengerjaan
+    return Math.floor((Date.now() - startTime) / 1000);
+  };
 
   const closeModal = () => {
     setIsModalVisible(null);
@@ -176,8 +199,6 @@ const stopTimer = () => {
     
     }
   
-    
-  
     // Clean up
     return () => {
       clearInterval(timerInterval);
@@ -185,10 +206,10 @@ const stopTimer = () => {
     };
   }, [timer, isExplanationVisible]);
   
-  
-  
+
 
   useEffect(() => {
+    setStartTime(Date.now());
     // Start the timer when the component is re-rendered (when it opens)
     startTimer();
   }, [currentQuestionIndex]); // Re-run the effect when currentQuestionIndex changes
