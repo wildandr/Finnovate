@@ -13,11 +13,14 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import FeedItem from '../components/FeedItem';
 import PlusButton from '../components/PlusButton';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import RNRestart from 'react-native-restart';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [feedData, setFeedData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [isLoggedin, setIsLoggedin] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -48,7 +51,9 @@ const HomeScreen = () => {
         style={tw`flex-row justify-between items-center absolute w-full px-5 top-5`}>
         <Image source={require('../assets/Finnovate_logo_top.png')} />
         <View style={tw`flex-row`}>
-          <Icon name="bell-o" size={24} color="white" style={tw`mr-3`} />
+          <TouchableOpacity>
+            <Icon name="bell-o" size={24} color="white" style={tw`mr-3`} />
+          </TouchableOpacity>
           <Icon name="cog" size={24} color="white" />
         </View>
       </View>
