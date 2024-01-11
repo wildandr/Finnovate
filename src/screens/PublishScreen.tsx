@@ -1,12 +1,17 @@
 import React, {useState} from 'react';
-import {View, TextInput, Text, Alert} from 'react-native';
+import {View, TextInput, Text, Alert, TouchableOpacity, Image} from 'react-native'; // Import Image from react-native
 import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Import MaterialIcons from react-native-vector-icons
 import tw from 'tailwind-react-native-classnames';
 import PublishButton from '../components/PublishButton';
 import {useNavigation} from '@react-navigation/native';
+import ShareButton from '../components/ShareButton';
+import TradingPlanCard from '../components/TradingPlanCard';
+import PublishImageCard from '../components/PublishImageCard';
 
 const PublishScreen = () => {
   const [content, setContent] = useState('');
+  const [showTradingPlanCard, setShowTradingPlanCard] = useState(false);
   const navigation = useNavigation();
 
   const publishPost = async () => {
@@ -38,10 +43,13 @@ const PublishScreen = () => {
   return (
     <View style={[tw`flex-1`, {backgroundColor: '#002351'}]}>
       <View style={tw`p-4`}>
-        <View style={tw`flex-row justify-between items-center mb-4`}>
-          <View style={tw`flex-1 ml-28`}>
-            <Text style={tw`text-2xl text-white`}>Create Post</Text>
-          </View>
+      <View style={tw`flex-row justify-between items-center mb-4`}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <MaterialIcons name="arrow-back-ios-new" size={24} color="white" />
+          </TouchableOpacity>
+            <View style={tw`flex-1 ml-20`}>
+                <Text style={tw`text-2xl text-white`}>Create Post</Text>
+            </View>
           <View style={tw`w-24`}>
             <PublishButton onPress={publishPost} />
           </View>
@@ -58,6 +66,14 @@ const PublishScreen = () => {
             numberOfLines={0}
           />
         </View>
+        <ShareButton onPress={() => setShowTradingPlanCard(prev => !prev)} />
+        {showTradingPlanCard && <TradingPlanCard />}
+        < PublishImageCard />
+      </View>
+      <View style={tw`absolute bottom-0 left-0 p-4`}>
+        <TouchableOpacity style={[tw`p-2 rounded-full`, {backgroundColor: "#2A476E"}]}>
+          <MaterialIcons name="image" size={24} color="white" />
+        </TouchableOpacity>
       </View>
     </View>
   );
