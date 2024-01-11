@@ -186,17 +186,24 @@ export default function Navigation() {
   const [isLoggedin, setIsLoggedin] = useState(false);
 
   useEffect(() => {
+    // command untuk skip login
     const checkLoginStatus = async () => {
       const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
       setIsLoggedin(isLoggedIn === 'true');
       setIsLoading(false);
+      // const isLoggedIn = true;
+
+      // setIsLoggedin(isLoggedIn);
+      // setIsLoading(false);
     };
 
     checkLoginStatus();
   }, []);
 
   const logout = async () => {
-    await AsyncStorage.removeItem('isLoggedIn');
+    // command untuk skip login
+    await AsyncStorage.removeItem('isLoggedIn'); 
+    
     setIsLoggedin(false);
   };
 
