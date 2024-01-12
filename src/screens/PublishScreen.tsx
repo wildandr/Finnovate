@@ -15,12 +15,26 @@ import {useNavigation} from '@react-navigation/native';
 import ShareButton from '../components/ShareButton';
 import TradingPlanCard from '../components/TradingPlanCard';
 import PublishImageCard from '../components/PublishImageCard';
+import ImagePicker from 'react-native-image-crop-picker';
+import storage from '@react-native-firebase/storage';
 
 const PublishScreen = () => {
   const [content, setContent] = useState('');
   const [showTradingPlanCard, setShowTradingPlanCard] = useState(false);
   const [tradingPlanCardValues, setTradingPlanCardValues] = useState({});
   const navigation = useNavigation();
+
+  const [image, setImage] = useState(null);
+
+  const openImagePicker = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: false,
+    }).then(image => {
+      setImage({uri: image.path});
+    });
+  };
 
   const publishPostCard = async () => {
     try {
@@ -125,11 +139,12 @@ const PublishScreen = () => {
         {showTradingPlanCard && (
           <TradingPlanCard onValuesChange={setTradingPlanCardValues} />
         )}
-        <PublishImageCard />
+        <PublishImageCard image={image} />
       </View>
       <View style={tw`absolute bottom-0 left-0 p-4`}>
         <TouchableOpacity
-          style={[tw`p-2 rounded-full`, {backgroundColor: '#2A476E'}]}>
+          style={[tw`p-2 rounded-full`, {backgroundColor: '#2A476E'}]}
+          onPress={openImagePicker}>
           <MaterialIcons name="image" size={24} color="white" />
         </TouchableOpacity>
       </View>
