@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
+import React, {useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import {Dropdown} from 'react-native-element-dropdown';
 
 const data = [
-  { label: 'bullish', value: '1' },
-  { label: 'bearish', value: '2' },
+  {label: 'Bullish', value: '1'},
+  {label: 'Bearish', value: '2'},
 ];
 
 const DropdownComponent = () => {
@@ -14,10 +14,13 @@ const DropdownComponent = () => {
   return (
     <View style={styles.container}>
       <Dropdown
-        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-        placeholderStyle={[styles.placeholderStyle, { color: 'white' }]}
-        selectedTextStyle={[styles.selectedTextStyle, { color: 'white', padding: 8 }]}
-        inputSearchStyle={[styles.inputSearchStyle, { color: 'white' }]}
+        style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
+        placeholderStyle={[styles.placeholderStyle, {color: 'white'}]}
+        selectedTextStyle={[
+          styles.selectedTextStyle,
+          {color: 'white', padding: 8},
+        ]}
+        inputSearchStyle={[styles.inputSearchStyle, {color: 'white'}]}
         iconStyle={styles.iconStyle}
         data={data}
         maxHeight={300}
@@ -28,9 +31,9 @@ const DropdownComponent = () => {
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
-            setIsFocus(false);
+          setIsFocus(false);
         }}
-        />
+      />
     </View>
   );
 };
