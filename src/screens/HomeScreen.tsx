@@ -21,6 +21,7 @@ const HomeScreen = () => {
   const [feedData, setFeedData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoggedin, setIsLoggedin] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -30,7 +31,6 @@ const HomeScreen = () => {
     try {
       const response = await fetch('http://10.0.2.2:3001/posts');
       const data = await response.json();
-      console.log(data);
       const sortedData = data.sort(
         (a: any, b: any) =>
           Number(new Date(b.date_created)) - Number(new Date(a.date_created)),
@@ -47,6 +47,24 @@ const HomeScreen = () => {
     setRefreshing(true);
     fetchData();
   }, [fetchData]);
+
+  const filteredData = feedData.filter(
+    (item: any) =>
+      (item.caption &&
+        item.caption.toLowerCase().includes(searchText.toLowerCase())) ||
+      (item.username &&
+        item.username.toLowerCase().includes(searchText.toLowerCase())) ||
+      (item.analysis &&
+        item.analysis.symbol &&
+        item.analysis.symbol
+          .toLowerCase()
+          .includes(searchText.toLowerCase())) ||
+      (item.analysis &&
+        item.analysis.full_name &&
+        item.analysis.full_name
+          .toLowerCase()
+          .includes(searchText.toLowerCase())),
+  );
   return (
     <View style={[tw`flex-1`, {backgroundColor: '#002351'}]}>
       <View
@@ -69,11 +87,12 @@ const HomeScreen = () => {
           style={[tw`flex-1`, {color: 'white', paddingLeft: 20}]}
           placeholder=" Search feeds, trend"
           placeholderTextColor="white"
+          onChangeText={text => setSearchText(text)}
         />
       </View>
 
       <FlatList
-        data={feedData as {post_id: number}[]}
+        data={filteredData as {post_id: number}[]}
         keyExtractor={item => item.post_id.toString()}
         renderItem={({item}) => <FeedItem item={item} />}
         style={tw`mt-40`}
