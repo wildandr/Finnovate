@@ -3,36 +3,53 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Modal from 'react-native-modal';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import { CountdownCircleTimer } from 'react-native-countdown-circle-timer';
 
 
 // Importing the questions array
 import { questions } from '../../data/question';
+import { StackNavigationProp } from '@react-navigation/stack';
+type RootStackParamList = {
+    QuizResult: {
+      correctAnswers: number;
+      timeTaken: number;
+    };
+    // ... other screen definitions
+  };
+  
+  type QuizResultScreenRouteProp = RouteProp<RootStackParamList, 'QuizResult'>;
+  type QuizResultScreenNavigationProp = StackNavigationProp<RootStackParamList, 'QuizResult'>;
+  
+  type Props = {
+    route: QuizResultScreenRouteProp;
+    navigation: QuizResultScreenNavigationProp;
+  };
 
 type ModalType = 'correctModal' | 'incorrectModal' | 'outOfTimeModal' | null;
 
-const QuizScreen = () => {
-  const navigation = useNavigation();
+const QuizScreen: React.FC<Props> = ({ route, navigation }) => {
+
 
   const handleGoBack = () => {
     navigation.goBack();
   };
 
-  const [timer, setTimer] = useState(15); // Timer awal 15 detik
+  const [timer, setTimer] = useState<number | null>(15); // Timer awal 15 detik
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(null);
   const [selectedOptionId, setSelectedOptionId] = useState<number | null>(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [isExplanationVisible, setIsExplanationVisible] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState<ModalType>(null);
+  const [isModalVisible, setIsModalVisible] = useState<ModalType | false>(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const currentQuestion = questions[currentQuestionIndex];
   const [isPlaying, setIsPlaying] = useState(true);
   const progressPercentage = Math.floor((currentQuestionIndex / questions.length) * 100);
-
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
+  const [startTime, setStartTime] = useState(0);
   const startTimer = () => {
     setTimer(15); // Set ulang timer menjadi 15 detik
-  
+    
   };
 
  
@@ -45,36 +62,47 @@ const stopTimer = () => {
 
   const handleOptionPress = (optionId: number) => {
     setSelectedOptionId(optionId);
-  
+
     const correctAnswerIndex = currentQuestion.correctAnswerIndex;
     const correct = optionId === correctAnswerIndex;
     setIsCorrect(correct);
     setIsExplanationVisible(true);
     setIsModalVisible(correct ? 'correctModal' : 'incorrectModal');
-   
+
+    if (correct) {
+      setCorrectAnswersCount((count) => count + 1); // Increment jumlah jawaban benar
+    }
   };
+
   
-  const handleNextQuestion = () => {
-    // Reset states for the next question
+  const handleNextQuestion = async () => {
     setSelectedOptionId(null);
     setIsCorrect(false);
     setIsExplanationVisible(false);
-    setIsModalVisible(null);
+    setIsModalVisible(false);
 
-    startTimer();
-    // Increment the current question index
     const nextQuestionIndex = currentQuestionIndex + 1;
 
-    // Check if there are more questions
     if (nextQuestionIndex < questions.length) {
-      // Move to the next question
       setCurrentQuestionIndex(nextQuestionIndex);
-    } else {
-      // No more questions, navigate to QuizResult screen
-      navigation.navigate('QuizResult');
+      stopTimer();
+      startTimer();
+    } else if (nextQuestionIndex === questions.length) {
+      setTimer(null);
+      stopTimer();
+
+      // Mengirim data ke QuizResult
+      navigation.navigate('QuizResult', {
+        correctAnswers: correctAnswersCount,
+        timeTaken: calculateTimeTaken(),
+      });
     }
   };
-  
+
+  const calculateTimeTaken = () => {
+    // Hitung selisih waktu sekarang dengan waktu mulai pengerjaan
+    return Math.floor((Date.now() - startTime) / 1000);
+  };
 
   const closeModal = () => {
     setIsModalVisible(null);
@@ -146,7 +174,7 @@ const stopTimer = () => {
   useEffect(() => {
     const myInterval = () => {
       setTimer((prevTimer) => {
-        if (prevTimer > 0 && !isExplanationVisible) {
+        if (prevTimer !== null && prevTimer > 0 && !isExplanationVisible) {
           // If timer is greater than 0 and explanation is not visible
           return prevTimer - 1;
         } else {
@@ -154,25 +182,34 @@ const stopTimer = () => {
             // If the explanation is visible, stop the timer
             stopTimer();
             return prevTimer;
+          } else {
+            setIsExplanationVisible(true);
+            setIsModalVisible('outOfTimeModal');
+            return 15; // Reset the timer to 15 when it reaches 0
           }
-          setIsExplanationVisible(true);
-          setIsModalVisible('outOfTimeModal');
-          return 15; // Reset the timer to 15 when it reaches 0
         }
       });
     };
   
+    const nextQuestionIndex = currentQuestionIndex + 1;
     const timerInterval = setInterval(myInterval, 1000);
+    // Check if it's the last question
+    if (nextQuestionIndex === questions.length) {
+      return clearInterval(timerInterval);
+    
+    }
   
     // Clean up
     return () => {
       clearInterval(timerInterval);
+      stopTimer();
     };
   }, [timer, isExplanationVisible]);
   
-  
+
 
   useEffect(() => {
+    setStartTime(Date.now());
     // Start the timer when the component is re-rendered (when it opens)
     startTimer();
   }, [currentQuestionIndex]); // Re-run the effect when currentQuestionIndex changes
@@ -268,6 +305,7 @@ const stopTimer = () => {
       {isModalVisible === 'correctModal' && <CorrectModal />}
       {isModalVisible === 'incorrectModal' && <IncorrectModal />}
       {isModalVisible === 'outOfTimeModal' && <OutOfTimeModal />}
+
     </View>
   );
 };
