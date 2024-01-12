@@ -212,21 +212,30 @@ app.post('/new-post', bodyParser.json(), function (req, res) {
     }
 
     const {user_id, caption} = req.body;
-    let {post_url, image_path} = req.body;
+    let {post_url, image_path, analysis_id} = req.body;
     const date_created = new Date();
     const date_updated = date_created;
 
     post_url = post_url || null;
     image_path = image_path || null;
+    analysis_id = analysis_id || null;
 
     const query = `
-      INSERT INTO Posts (user_id, caption, post_url, date_created, date_updated, image_path)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO Posts (user_id, caption, post_url, date_created, date_updated, image_path, analysis_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     connection.query(
       query,
-      [user_id, caption, post_url, date_created, date_updated, image_path],
+      [
+        user_id,
+        caption,
+        post_url,
+        date_created,
+        date_updated,
+        image_path,
+        analysis_id,
+      ],
       (error, results) => {
         connection.release();
 
@@ -675,7 +684,6 @@ app.delete('/follow/delete', function (req, res) {
 
 app.post('/postcards', (req, res) => {
   let {
-    post_id,
     symbol,
     full_name,
     target_price,
@@ -691,7 +699,6 @@ app.post('/postcards', (req, res) => {
 
   const insertQuery = `
     INSERT INTO PostCards (
-      post_id,
       symbol,
       full_name,
       target_price,
@@ -701,13 +708,12 @@ app.post('/postcards', (req, res) => {
       disagree_count,
       timing,
       prediction
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   connection.query(
     insertQuery,
     [
-      post_id,
       symbol,
       full_name,
       target_price,

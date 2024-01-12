@@ -1,15 +1,25 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, TextInput, TouchableOpacity} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import DatePicker from 'react-native-date-picker';
 import DropdownPrediction from './DropdownPrediction';
 import {MaterialIcons} from 'react-native-vector-icons';
 
-const TradingPlanCard = () => {
+const TradingPlanCard = ({onValueChange}) => {
   const [equitySymbol, setEquitySymbol] = useState('');
   const [targetPrice, setTargetPrice] = useState('');
+  const [initiatePrice, setInitiatePrice] = useState('');
   const [timing, setTiming] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const calculateUpsidePercentage = (initialPrice, targetPrice) => {
+    return ((targetPrice - initialPrice) / initialPrice) * 100;
+  };
+
+  const upsidePercentage = calculateUpsidePercentage(
+    initiatePrice,
+    targetPrice,
+  );
 
   return (
     <View>
@@ -22,6 +32,16 @@ const TradingPlanCard = () => {
           placeholderTextColor="gray"
           style={[
             tw`p-2 pl-4 rounded-lg border-0 text-white`,
+            {backgroundColor: '#001736'},
+          ]}
+        />
+        <TextInput
+          value={initiatePrice}
+          onChangeText={setInitiatePrice}
+          placeholder="Enter initiate price"
+          placeholderTextColor="gray"
+          style={[
+            tw`p-2 pl-4 rounded-lg border-0 text-white mt-4`,
             {backgroundColor: '#001736'},
           ]}
         />
