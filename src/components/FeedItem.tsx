@@ -78,21 +78,21 @@ const FeedItem = ({item}: {item: any}) => {
         </View>
         <Text style={tw`text-white my-3`}>{item.caption}</Text>
         {item.image_path && (
-        <View
-          style={{
-            width: 200,
-            height: 200,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image
-            source={{uri: item.image_path}}
-            resizeMode="cover"
-            style={{width: '100%', height: '100%'}}
-          />
-        </View>
-      )}
-      <PredictionCard />
+          <View
+            style={{
+              width: 200,
+              height: 200,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Image
+              source={{uri: item.image_path}}
+              resizeMode="cover"
+              style={{width: '100%', height: '100%'}}
+            />
+          </View>
+        )}
+        {item.analysis && <PredictionCard analysis={item.analysis} />}
 
         <View style={tw`flex-row`}>
           <View style={tw`flex-row items-center mr-4`}>

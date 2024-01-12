@@ -1,3 +1,4 @@
+const moment = require('moment');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
@@ -13,10 +14,8 @@ const app = express();
 
 const bcrypt = require('bcrypt');
 
-// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}));
 
-// parse application/json
 app.use(bodyParser.json());
 
 app.get('/posts', function (req, res) {
@@ -39,33 +38,166 @@ app.get('/posts', function (req, res) {
 `;
 
     connection.query(query, (error, results) => {
-      connection.release();
-
       if (error) {
         console.log(error);
         res.status(500).send('An error occurred while fetching posts');
-      } else {
-        res.status(200).json(results);
+        connection.release();
+        return;
       }
+
+      let completedQueries = 0;
+      results.forEach((post, index) => {
+        const commentsQuery = `
+          SELECT comment_id, post_id, user_id, content, date_created, parent_comment_id
+          FROM Comments
+          WHERE post_id = ?
+          ORDER BY parent_comment_id ASC
+        `;
+
+        connection.query(commentsQuery, [post.post_id], (error, comments) => {
+          if (error) {
+            console.log(error);
+            res.status(500).send('An error occurred while fetching comments');
+            connection.release();
+            return;
+          }
+
+          const commentsWithReplies = comments.reduce((acc, comment) => {
+            if (comment.parent_comment_id) {
+              const parentComment = acc.find(
+                c => c.comment_id === comment.parent_comment_id,
+              );
+              if (parentComment) {
+                parentComment.replies = parentComment.replies || [];
+                parentComment.replies.push(comment);
+              }
+            } else {
+              acc.push(comment);
+            }
+            return acc;
+          }, []);
+
+          results[index].commentsArray = commentsWithReplies;
+
+          if (post.analysis_id) {
+            const analysisQuery = `
+              SELECT *
+              FROM PostCards
+              WHERE analysis_id = ?
+            `;
+
+            connection.query(
+              analysisQuery,
+              [post.analysis_id],
+              (error, analysis) => {
+                if (error) {
+                  console.log(error);
+                  res
+                    .status(500)
+                    .send('An error occurred while fetching analysis');
+                  connection.release();
+                  return;
+                }
+
+                results[index].analysis = analysis[0];
+                completedQueries++;
+
+                if (completedQueries === results.length) {
+                  res.status(200).json(results);
+                  connection.release();
+                }
+              },
+            );
+          } else {
+            completedQueries++;
+
+            if (completedQueries === results.length) {
+              res.status(200).json(results);
+              connection.release();
+            }
+          }
+        });
+      });
     });
   });
 });
 
 app.get('/posts/:id', function (req, res) {
   const postId = req.params.id;
-  connection.getConnection(function (err, connection) {
-    connection.query(
-      'SELECT * FROM Posts WHERE post_id = ?',
-      [postId],
-      (error, results) => {
-        if (error) {
-          console.log(error);
-          res.status(500).send('An error occurred while fetching the post');
+  const query = `
+    SELECT Posts.*, Users.username, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+    FROM Posts
+    LEFT JOIN Likes ON Posts.post_id = Likes.post_id
+    LEFT JOIN Comments ON Posts.post_id = Comments.post_id
+    LEFT JOIN Users ON Posts.user_id = Users.user_id
+    WHERE Posts.post_id = ?
+    GROUP BY Posts.post_id
+  `;
+
+  connection.query(query, [postId], (error, results) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send('An error occurred while fetching the post');
+      return;
+    }
+
+    const post = results[0];
+    const commentsQuery = `
+      SELECT comment_id, post_id, user_id, content, date_created, parent_comment_id
+      FROM Comments
+      WHERE post_id = ?
+      ORDER BY parent_comment_id ASC
+    `;
+
+    connection.query(commentsQuery, [post.post_id], (error, comments) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching comments');
+        return;
+      }
+
+      const commentsWithReplies = comments.reduce((acc, comment) => {
+        if (comment.parent_comment_id) {
+          const parentComment = acc.find(
+            c => c.comment_id === comment.parent_comment_id,
+          );
+          if (parentComment) {
+            parentComment.replies = parentComment.replies || [];
+            parentComment.replies.push(comment);
+          }
         } else {
-          res.status(200).json(results);
+          acc.push(comment);
         }
-      },
-    );
+        return acc;
+      }, []);
+
+      post.commentsArray = commentsWithReplies;
+
+      if (post.analysis_id) {
+        const analysisQuery = `
+          SELECT *
+          FROM PostCards
+          WHERE analysis_id = ?
+        `;
+
+        connection.query(
+          analysisQuery,
+          [post.analysis_id],
+          (error, analysis) => {
+            if (error) {
+              console.log(error);
+              res.status(500).send('An error occurred while fetching analysis');
+              return;
+            }
+
+            post.analysis = analysis[0];
+            res.status(200).json(post);
+          },
+        );
+      } else {
+        res.status(200).json(post);
+      }
+    });
   });
 });
 
@@ -80,21 +212,30 @@ app.post('/new-post', bodyParser.json(), function (req, res) {
     }
 
     const {user_id, caption} = req.body;
-    let {post_url, image_path} = req.body;
+    let {post_url, image_path, analysis_id} = req.body;
     const date_created = new Date();
     const date_updated = date_created;
 
     post_url = post_url || null;
     image_path = image_path || null;
+    analysis_id = analysis_id || null;
 
     const query = `
-      INSERT INTO Posts (user_id, caption, post_url, date_created, date_updated, image_path)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO Posts (user_id, caption, post_url, date_created, date_updated, image_path, analysis_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     connection.query(
       query,
-      [user_id, caption, post_url, date_created, date_updated, image_path],
+      [
+        user_id,
+        caption,
+        post_url,
+        date_created,
+        date_updated,
+        image_path,
+        analysis_id,
+      ],
       (error, results) => {
         connection.release();
 
@@ -104,6 +245,149 @@ app.post('/new-post', bodyParser.json(), function (req, res) {
         } else {
           res.status(200).send('New post created successfully');
         }
+      },
+    );
+  });
+});
+
+// Endpoint untuk melihat daftar komen pada sebuah post
+app.get('/posts/:postId/comments', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const {postId} = req.params;
+
+    const mainCommentsQuery = `
+      SELECT 
+        Comments.*, 
+        (SELECT COUNT(*) FROM CommentLikes WHERE CommentLikes.comment_id = Comments.comment_id) AS likes_count,
+        (SELECT COUNT(*) FROM Comments AS Replies WHERE Replies.parent_comment_id = Comments.comment_id) AS replies_count
+      FROM Comments 
+      WHERE post_id = ? AND parent_comment_id IS NULL
+    `;
+
+    const repliesQuery = `
+      SELECT 
+        Comments.*, 
+        (SELECT COUNT(*) FROM CommentLikes WHERE CommentLikes.comment_id = Comments.comment_id) AS likes_count
+      FROM Comments 
+      WHERE post_id = ? AND parent_comment_id IS NOT NULL
+    `;
+
+    connection.query(mainCommentsQuery, [postId], (error, mainComments) => {
+      if (error) {
+        console.log(error);
+        connection.release();
+        res.status(500).send('An error occurred while fetching comments');
+        return;
+      }
+
+      connection.query(repliesQuery, [postId], (error, replies) => {
+        connection.release();
+
+        if (error) {
+          console.log(error);
+          res.status(500).send('An error occurred while fetching comments');
+          return;
+        }
+
+        mainComments.forEach(comment => {
+          comment.replies = replies.filter(
+            reply => reply.parent_comment_id === comment.comment_id,
+          );
+        });
+
+        res.status(200).json(mainComments);
+      });
+    });
+  });
+});
+
+// Endpoint untuk menambahkan komentar baru
+app.post('/posts/:postId/comments', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const {content, userId} = req.body;
+    const {postId} = req.params;
+    const offset = 7;
+    const date = new Date();
+    date.setHours(date.getHours() + offset);
+    const date_created = date.toISOString().slice(0, 19).replace('T', ' ');
+
+    const query = `
+      INSERT INTO Comments (post_id, user_id, content, date_created)
+      VALUES (?, ?, ?, ?)
+    `;
+
+    connection.query(
+      query,
+      [postId, userId, content, date_created],
+      (error, results) => {
+        if (error) {
+          console.log(error);
+          res.status(500).send('An error occurred while adding the comment');
+          connection.release();
+          return;
+        }
+
+        res.status(200).json({message: 'Comment added successfully'});
+        connection.release();
+      },
+    );
+  });
+});
+
+// Endpoint untuk membalas komentar
+app.post('/posts/:postId/comments/:commentId/replies', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const offset = 7;
+    const date = new Date();
+    date.setHours(date.getHours() + offset);
+    const date_created = date.toISOString().slice(0, 19).replace('T', ' ');
+
+    const {content, userId} = req.body;
+    const {postId, commentId} = req.params;
+    const parent_comment_id = commentId;
+
+    const query = `
+  INSERT INTO Comments (post_id, user_id, content, parent_comment_id, date_created)
+  VALUES (?, ?, ?, ?, ?)
+`;
+
+    connection.query(
+      query,
+      [postId, userId, content, parent_comment_id, date_created],
+      (error, results) => {
+        if (error) {
+          console.log(error);
+          res.status(500).send('An error occurred while adding the comment');
+          connection.release();
+          return;
+        }
+
+        res.status(200).json({message: 'Comment added successfully'});
+        connection.release();
       },
     );
   });
@@ -194,7 +478,14 @@ app.post('/users/login', async function (req, res) {
           );
 
           if (comparison) {
-            res.status(200).send('User logged in successfully');
+            // Return the desired data
+            res.status(200).json({
+              email: results[0].email,
+              username: results[0].username,
+              full_name: results[0].full_name,
+              profile_picture_url: results[0].profile_picture_url,
+              description: results[0].description,
+            });
           } else {
             res.status(401).send('Wrong password');
           }
@@ -202,6 +493,248 @@ app.post('/users/login', async function (req, res) {
           res.status(404).send('User not found');
         }
       }
+    },
+  );
+});
+
+// GET route for comment likes
+app.get('/commentLikes', function (req, res) {
+  connection.query('SELECT * FROM CommentLikes', (error, results) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send('An error occurred while fetching comment likes');
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+// POST route for comment likes
+app.post('/commentLikes/create', function (req, res) {
+  const {user_id, comment_id} = req.body;
+  connection.query(
+    'INSERT INTO CommentLikes (user_id, comment_id, date_created) VALUES (?, ?, NOW())',
+    [user_id, comment_id],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while creating a comment like');
+      } else {
+        res.status(200).send('Comment like created successfully');
+      }
+    },
+  );
+});
+
+// DELETE route for comment likes
+app.delete('/commentLikes/delete', function (req, res) {
+  const {user_id, comment_id} = req.body;
+  connection.query(
+    'DELETE FROM CommentLikes WHERE user_id = ? AND comment_id = ?',
+    [user_id, comment_id],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while deleting a comment like');
+      } else {
+        res.status(200).send('Comment like deleted successfully');
+      }
+    },
+  );
+});
+
+// GET route for user info, follower count, and post count
+app.get('/users/:userId', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const {userId} = req.params;
+
+    const query = `
+      SELECT 
+        Users.user_id,
+        Users.email,
+        Users.username,
+        Users.full_name,
+        Users.profile_picture_url,
+        Users.description,
+        (SELECT COUNT(*) FROM Followings WHERE Followings.following_id = Users.user_id) AS followers_count,
+        (SELECT COUNT(*) FROM Posts WHERE Posts.user_id = Users.user_id) AS posts_count
+      FROM Users 
+      WHERE Users.user_id = ?
+    `;
+
+    connection.query(query, [userId], (error, results) => {
+      connection.release();
+
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching user info');
+      } else {
+        res.status(200).json(results);
+      }
+    });
+  });
+});
+
+// GET route for user followers
+app.get('/users/:userId/followers', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const {userId} = req.params;
+
+    const query = `
+      SELECT 
+        Users.user_id,
+        Users.username,
+        Users.full_name,
+        Users.profile_picture_url
+      FROM Users 
+      INNER JOIN Followings ON Users.user_id = Followings.user_id
+      WHERE Followings.following_id = ?
+    `;
+
+    connection.query(query, [userId], (error, results) => {
+      connection.release();
+
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching followers');
+      } else {
+        res.status(200).json(results);
+      }
+    });
+  });
+});
+
+// POST route for creating a follow
+app.post('/follow', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const {userId, followingId} = req.body;
+
+    const query = `
+      INSERT INTO Followings (user_id, following_id, date_created)
+      VALUES (?, ?, NOW())
+    `;
+
+    connection.query(query, [userId, followingId], (error, results) => {
+      connection.release();
+
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while creating a follow');
+      } else {
+        res.status(200).send('Follow created successfully');
+      }
+    });
+  });
+});
+
+// DELETE route for deleting a follow
+app.delete('/follow/delete', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const {userId, followingId} = req.body;
+
+    const query = `
+      DELETE FROM Followings 
+      WHERE user_id = ? AND following_id = ?
+    `;
+
+    connection.query(query, [userId, followingId], (error, results) => {
+      connection.release();
+
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while deleting a follow');
+      } else {
+        res.status(200).send('Follow deleted successfully');
+      }
+    });
+  });
+});
+
+app.post('/postcards', (req, res) => {
+  let {
+    symbol,
+    full_name,
+    target_price,
+    initial_price,
+    upside_percentage,
+    agree_count,
+    disagree_count,
+    timing,
+    prediction,
+  } = req.body;
+
+  timing = moment(timing).format('YYYY-MM-DD HH:mm:ss');
+
+  const insertQuery = `
+    INSERT INTO PostCards (
+      symbol,
+      full_name,
+      target_price,
+      initial_price,
+      upside_percentage,
+      agree_count,
+      disagree_count,
+      timing,
+      prediction
+    ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  connection.query(
+    insertQuery,
+    [
+      symbol,
+      full_name,
+      target_price,
+      initial_price,
+      upside_percentage,
+      agree_count,
+      disagree_count,
+      timing,
+      prediction,
+    ],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while creating the post card');
+        return;
+      }
+
+      res.status(201).json({
+        message: 'Post card created successfully',
+        id: results.insertId,
+      });
     },
   );
 });

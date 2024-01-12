@@ -1,34 +1,64 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import Icons from 'react-native-vector-icons/AntDesign';
+import {format} from 'date-fns';
 
-const PredictionCard = () => {
+const PredictionCard = ({analysis}) => {
   return (
     <View style={[tw`p-4 rounded-md mb-5`, {backgroundColor: '#2A476E'}]}>
-      <Text style={tw`text-white`}>Prediction - <Text style={tw`text-green-500`}>Bullish</Text></Text>
+      <View style={tw`flex-row items-center`}>
+        <Text style={tw`text-white`}>Prediction - </Text>
+        <Text
+          style={
+            analysis.prediction === 'Bullish'
+              ? tw`text-green-500`
+              : tw`text-red-500`
+          }>
+          {analysis.prediction}
+        </Text>
+      </View>
       <View style={tw`flex-row items-center mt-2`}>
-        <Text style={[tw`text-white font-bold`, {fontSize: 22, fontStyle: 'bold'}]}>GOTO</Text>
-        <Text style={[tw`text-gray-500 text-center ml-2`, {fontSize: 10}]}>GoTo Gojek Tokopedia Tbk</Text>
-        </View>
-        <View style={tw`flex-row items-center mt-2`}>
-            <Text style={[tw`text-white font-bold`, {fontSize: 32, fontStyle: 'bold'}]}>3,123</Text>
-            <Text style={[tw`text-white text-center ml-2`, {fontSize: 10}]}>Target Price</Text>
-        </View>
-        <View style={tw`flex-row justify-between mt-2`}>
+        <Text
+          style={[tw`text-white font-bold`, {fontSize: 22, fontStyle: 'bold'}]}>
+          {analysis.symbol}
+        </Text>
+        <Text style={[tw`text-white text-center ml-2`, {fontSize: 10}]}>
+          {analysis.full_name}
+        </Text>
+      </View>
+      <View style={tw`flex-row items-center mt-2`}>
+        <Text
+          style={[tw`text-white font-bold`, {fontSize: 32, fontStyle: 'bold'}]}>
+          {analysis.target_price}
+        </Text>
+        <Text style={[tw`text-white text-center ml-2`, {fontSize: 10}]}>
+          Target Price
+        </Text>
+      </View>
+      <View style={tw`flex-row justify-between mt-2`}>
         <View style={tw`items-center`}>
-            <Text style={tw`text-white`}>Initial Price</Text>
-            <Text style={tw`text-white`}>2,500</Text>
+          <Text style={tw`text-white`}>Initial Price</Text>
+          <Text style={tw`text-white`}>{analysis.initial_price}</Text>
         </View>
         <View style={tw`items-center`}>
-            <Text style={tw`text-white`}>Upside</Text>
-            <Text style={tw`text-green-500`}>+40,23%</Text>
+          <Text style={tw`text-white`}>Upside</Text>
+          <Text
+            style={
+              analysis.upside_percentage < 0
+                ? tw`text-red-500`
+                : tw`text-green-500`
+            }>
+            {analysis.upside_percentage}%
+          </Text>
         </View>
         <View style={tw`items-center`}>
-            <Text style={tw`text-white`}>Timing</Text>
-            <Text style={tw`text-white`}>6 Jan 2024</Text>
+          <Text style={tw`text-white`}>Timing</Text>
+          <Text style={tw`text-white`}>
+            {format(new Date(analysis.timing), 'dd MMM yyyy')}
+          </Text>
         </View>
-        </View>
+      </View>
       <View style={tw`flex-row mt-2`}>
         <TouchableOpacity style={tw`flex-row items-center`}>
           <Icons name="downcircle" size={24} color="red" />
