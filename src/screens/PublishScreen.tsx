@@ -66,7 +66,7 @@ const PublishScreen = () => {
           <TextInput
             style={[tw`flex-1 p-2`, {color: 'white', flexShrink: 1}]}
             placeholder="What have you been eyeing lately?"
-            placeholderTextColor="#CBD5E0" // gray-200 in Tailwind CSS
+            placeholderTextColor="#CBD5E0"
             value={content}
             onChangeText={setContent}
             multiline
