@@ -7,7 +7,8 @@ const data = [
   {label: 'Bearish', value: '2'},
 ];
 
-const DropdownComponent = () => {
+const DropdownComponent = ({onValueChange}) => {
+  // add onValueChange prop
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
 
@@ -31,6 +32,8 @@ const DropdownComponent = () => {
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
+          setValue(item.value); // set the value state
+          onValueChange(item.label); // call onValueChange with the label of the selected item
           setIsFocus(false);
         }}
       />
