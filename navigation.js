@@ -28,6 +28,8 @@ import CourseContent from './src/screens/Education/CourseContent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import QuizScreen from './src/screens/Education/QuizScreen';
 import QuizResult from './src/screens/Education/QuizResult';
+import EditProfileScreen from './src/screens/EditProfileScreen';
+import FollowersScreen from './src/screens/FollowersScreen';
 
 
 const RootStack = createStackNavigator();
@@ -120,6 +122,23 @@ function HomeStackGroup() {
   );
 }
 
+// Profile Stack
+const ProfileStack = createStackNavigator();
+
+function ProfileStackGroup() {
+  return (
+    <ProfileStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      }}>
+      <ProfileStack.Screen name="Profile" component={ProfileScreen} />
+      <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
+      <ProfileStack.Screen name="Followers" component={FollowersScreen} />
+    </ProfileStack.Navigator>
+  );
+}
+
 // Bottom Tab
 const Tab = createBottomTabNavigator();
 
@@ -169,7 +188,7 @@ const BottomTabNavigator = () => {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStackGroup}
         options={{
           headerShown: false,
           tabBarIcon: ({color, size}) => (
