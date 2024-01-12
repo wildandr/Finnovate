@@ -1,79 +1,45 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Finnovate
 
-# Getting Started
+Finnovate is an application that integrates social media for traders, a market watch feature, AI-based price predictions, and gamified education. The application is developed using React Native, MySQL, and Node.js. The key features include Login, Register, Social Media sharing of analyses, Market Watch, AI-based price predictions (both fundamental and technical), AI-driven notifications, and gamified education. Below is a detailed overview of the components and platforms integrated into Finnovate.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Components and Platforms:
 
-## Step 1: Start the Metro Server
+### 1. Social Media and Community Platform:
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+- **Purpose:** Create a space for traders and investors, fostering learning through shared analyses and predictions.
+- **Features:**
+  - Posting analyses and predictions
+  - Scoring accounts based on accuracy
+  - Custom notifications
+  - Commenting, liking, and following
+  - Activating specific notifications for individuals or equities
+- **Inspiration:** The platform is inspired by the need to build a community-driven ecosystem where users learn from each other, verify information, and establish a trustworthy network.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+### 2. AI Prediction and Notification System:
 
-```bash
-# using npm
-npm start
+- **Purpose:** Integrate artificial intelligence to predict market trends and sentiments, providing users with data-driven insights.
+- **Features:**
+  - AI-based predictions
+  - Custom notifications
+  - Tracking news related to specific equities
+  - Evaluating predictions based on technical and fundamental analyses
+- **Inspiration:** This component is inspired by the necessity of leveraging advanced technologies to enhance the accuracy of market predictions and enable users to stay informed.
 
-# OR using Yarn
-yarn start
-```
+### 3. Scoring System for Accountability:
 
-## Step 2: Start your Application
+- **Purpose:** Establish accountability through a scoring system, reflecting the accuracy of predictions made by users.
+- **Features:**
+  - Scoring accounts based on the accuracy of predictions
+  - Influencing the reputation and trustworthiness of each user
+- **Inspiration:** This component is inspired by the need to ensure transparency and reliability within the community, discouraging misinformation and unverified analyses.
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+## Team Members:
 
-### For Android
+- **Wildan Dzaky Ramadhani** - _Hustler_
+- **Darriel Markerizal** - _Hipster_
+- **Yodhimas Geffananda** - _Hacker_
+- **Nawal Rizky Kautsar** - _Hacker_
 
-```bash
-# using npm
-npm run android
+## Project Goals:
 
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+In summary, Finnovate aims to address challenges in the Indonesian investment landscape by combining educational, technological, and community-driven solutions, aligned with various UN Sustainable Development Goals. The selected goals provide a comprehensive framework to address the multifaceted issues associated with the increasing interest in investments. Finnovate is designed to create an inclusive, informed, and accountable trading community.
