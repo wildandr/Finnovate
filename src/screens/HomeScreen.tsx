@@ -30,8 +30,10 @@ const HomeScreen = () => {
     try {
       const response = await fetch('http://10.0.2.2:3001/posts');
       const data = await response.json();
+      console.log(data);
       const sortedData = data.sort(
-        (a: any, b: any) => Number(new Date(b.date_created)) - Number(new Date(a.date_created)),
+        (a: any, b: any) =>
+          Number(new Date(b.date_created)) - Number(new Date(a.date_created)),
       );
       setFeedData(sortedData);
     } catch (error) {
@@ -71,7 +73,7 @@ const HomeScreen = () => {
       </View>
 
       <FlatList
-        data={feedData as { post_id: number }[]}
+        data={feedData as {post_id: number}[]}
         keyExtractor={item => item.post_id.toString()}
         renderItem={({item}) => <FeedItem item={item} />}
         style={tw`mt-40`}

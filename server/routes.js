@@ -1,3 +1,4 @@
+const moment = require('moment');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
@@ -77,11 +78,43 @@ app.get('/posts', function (req, res) {
           }, []);
 
           results[index].commentsArray = commentsWithReplies;
-          completedQueries++;
 
-          if (completedQueries === results.length) {
-            res.status(200).json(results);
-            connection.release();
+          if (post.analysis_id) {
+            const analysisQuery = `
+              SELECT *
+              FROM PostCards
+              WHERE analysis_id = ?
+            `;
+
+            connection.query(
+              analysisQuery,
+              [post.analysis_id],
+              (error, analysis) => {
+                if (error) {
+                  console.log(error);
+                  res
+                    .status(500)
+                    .send('An error occurred while fetching analysis');
+                  connection.release();
+                  return;
+                }
+
+                results[index].analysis = analysis[0];
+                completedQueries++;
+
+                if (completedQueries === results.length) {
+                  res.status(200).json(results);
+                  connection.release();
+                }
+              },
+            );
+          } else {
+            completedQueries++;
+
+            if (completedQueries === results.length) {
+              res.status(200).json(results);
+              connection.release();
+            }
           }
         });
       });
@@ -91,19 +124,80 @@ app.get('/posts', function (req, res) {
 
 app.get('/posts/:id', function (req, res) {
   const postId = req.params.id;
-  connection.getConnection(function (err, connection) {
-    connection.query(
-      'SELECT * FROM Posts WHERE post_id = ?',
-      [postId],
-      (error, results) => {
-        if (error) {
-          console.log(error);
-          res.status(500).send('An error occurred while fetching the post');
+  const query = `
+    SELECT Posts.*, Users.username, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+    FROM Posts
+    LEFT JOIN Likes ON Posts.post_id = Likes.post_id
+    LEFT JOIN Comments ON Posts.post_id = Comments.post_id
+    LEFT JOIN Users ON Posts.user_id = Users.user_id
+    WHERE Posts.post_id = ?
+    GROUP BY Posts.post_id
+  `;
+
+  connection.query(query, [postId], (error, results) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send('An error occurred while fetching the post');
+      return;
+    }
+
+    const post = results[0];
+    const commentsQuery = `
+      SELECT comment_id, post_id, user_id, content, date_created, parent_comment_id
+      FROM Comments
+      WHERE post_id = ?
+      ORDER BY parent_comment_id ASC
+    `;
+
+    connection.query(commentsQuery, [post.post_id], (error, comments) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching comments');
+        return;
+      }
+
+      const commentsWithReplies = comments.reduce((acc, comment) => {
+        if (comment.parent_comment_id) {
+          const parentComment = acc.find(
+            c => c.comment_id === comment.parent_comment_id,
+          );
+          if (parentComment) {
+            parentComment.replies = parentComment.replies || [];
+            parentComment.replies.push(comment);
+          }
         } else {
-          res.status(200).json(results);
+          acc.push(comment);
         }
-      },
-    );
+        return acc;
+      }, []);
+
+      post.commentsArray = commentsWithReplies;
+
+      if (post.analysis_id) {
+        const analysisQuery = `
+          SELECT *
+          FROM PostCards
+          WHERE analysis_id = ?
+        `;
+
+        connection.query(
+          analysisQuery,
+          [post.analysis_id],
+          (error, analysis) => {
+            if (error) {
+              console.log(error);
+              res.status(500).send('An error occurred while fetching analysis');
+              return;
+            }
+
+            post.analysis = analysis[0];
+            res.status(200).json(post);
+          },
+        );
+      } else {
+        res.status(200).json(post);
+      }
+    });
   });
 });
 
@@ -577,6 +671,66 @@ app.delete('/follow/delete', function (req, res) {
       }
     });
   });
+});
+
+app.post('/postcards', (req, res) => {
+  let {
+    post_id,
+    symbol,
+    full_name,
+    target_price,
+    initial_price,
+    upside_percentage,
+    agree_count,
+    disagree_count,
+    timing,
+    prediction,
+  } = req.body;
+
+  timing = moment(timing).format('YYYY-MM-DD HH:mm:ss');
+
+  const insertQuery = `
+    INSERT INTO PostCards (
+      post_id,
+      symbol,
+      full_name,
+      target_price,
+      initial_price,
+      upside_percentage,
+      agree_count,
+      disagree_count,
+      timing,
+      prediction
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  connection.query(
+    insertQuery,
+    [
+      post_id,
+      symbol,
+      full_name,
+      target_price,
+      initial_price,
+      upside_percentage,
+      agree_count,
+      disagree_count,
+      timing,
+      prediction,
+    ],
+    (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while creating the post card');
+        return;
+      }
+
+      res.status(201).json({
+        message: 'Post card created successfully',
+        id: results.insertId,
+      });
+    },
+  );
 });
 
 app.listen(3001, () => {
