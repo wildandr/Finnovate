@@ -5,25 +5,37 @@ import DatePicker from 'react-native-date-picker';
 import DropdownPrediction from './DropdownPrediction';
 import {MaterialIcons} from 'react-native-vector-icons';
 
-const TradingPlanCard = ({onValueChange}) => {
+const TradingPlanCard = ({onValuesChange}) => {
   const [equitySymbol, setEquitySymbol] = useState('');
   const [targetPrice, setTargetPrice] = useState('');
   const [initiatePrice, setInitiatePrice] = useState('');
   const [timing, setTiming] = useState<Date | null>(null);
+  const [prediction, setPrediction] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  useEffect(() => {
+    const upsidePercentage = calculateUpsidePercentage(
+      parseFloat(initiatePrice),
+      parseFloat(targetPrice),
+    );
+
+    onValuesChange({
+      equitySymbol,
+      targetPrice,
+      initiatePrice,
+      timing,
+      upsidePercentage,
+      prediction,
+    });
+  }, [equitySymbol, targetPrice, initiatePrice, timing, onValuesChange]);
 
   const calculateUpsidePercentage = (initialPrice, targetPrice) => {
     return ((targetPrice - initialPrice) / initialPrice) * 100;
   };
 
-  const upsidePercentage = calculateUpsidePercentage(
-    initiatePrice,
-    targetPrice,
-  );
-
   return (
     <View>
-      <DropdownPrediction />
+      <DropdownPrediction onValueChange={setPrediction} />
       <View style={[tw`p-4`, {backgroundColor: '#2A476E'}]}>
         <TextInput
           value={equitySymbol}
