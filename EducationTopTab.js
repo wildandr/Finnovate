@@ -38,6 +38,7 @@ const EducationTopTab = () => (
     <Tab.Screen
       name="Discover"
       component={Course}
+      initialParams={{ category: undefined }}
       options={{
         tabBarLabel: ({ focused, color }) => (
           <CustomTabLabel label="Discover" focused={focused} color={color} style={[tw``,]} fontSize={14} />
@@ -47,6 +48,7 @@ const EducationTopTab = () => (
     <Tab.Screen
       name="Beginner"
       component={Course}
+      initialParams={{ category: 'Beginner' }}
       options={{
         tabBarLabel: ({ focused, color }) => (
           <CustomTabLabel label="Beginner" focused={focused} color={color} style={[tw``]} fontSize={14} />
@@ -56,6 +58,7 @@ const EducationTopTab = () => (
     <Tab.Screen
       name="Moderate"
       component={Course}
+      initialParams={{ category: 'Moderate' }}
       options={{
         tabBarLabel: ({ focused, color }) => (
           <CustomTabLabel label="Moderate" focused={focused} color={color} style={[tw``]} fontSize={14} />
@@ -65,6 +68,7 @@ const EducationTopTab = () => (
     <Tab.Screen
       name="Advanced"
       component={Course}
+      initialParams={{ category: 'Advanced' }}
       options={{
         tabBarLabel: ({ focused, color }) => (
           <CustomTabLabel label="Advanced" focused={focused} color={color} style={[tw``]} fontSize={14} />
