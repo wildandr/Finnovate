@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import FeedItem from '../components/FeedItem';
-import PlusButton from '../components/PlusButton';
+import FeedItem from '../../../components/FeedItem';
+import PlusButton from '../../../components/PlusButton';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
 
-const PostsScreen = () => {
+const ProfileAnalysisScreen = () => {
   const navigation = useNavigation();
   const [feedData, setFeedData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -28,7 +28,10 @@ const PostsScreen = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await fetch('http://10.0.2.2:3001/posts');
+      const userId = 1;
+      const response = await fetch(
+        `http://10.0.2.2:3001/users/${userId}/posts-with-analysis`,
+      );
       const data = await response.json();
       const sortedData = data.sort(
         (a: any, b: any) =>
@@ -61,4 +64,4 @@ const PostsScreen = () => {
   );
 };
 
-export default PostsScreen;
+export default ProfileAnalysisScreen;
