@@ -2,9 +2,9 @@ import React, {useState} from 'react';
 import {View, Image, Text, TouchableOpacity, Alert} from 'react-native';
 import {Checkbox} from 'react-native-paper';
 import tw from 'tailwind-react-native-classnames';
-import LoginButton from '../components/Login_LoginButton';
-import CustomTextInput from '../components/Register_TextInput';
-import GoogleLoginButton from '../components/GoogleLoginButton';
+import LoginButton from '../../components/Login_LoginButton';
+import CustomTextInput from '../../components/Register_TextInput';
+import GoogleLoginButton from '../../components/GoogleLoginButton';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -81,7 +81,7 @@ const LoginScreen: React.FC = () => {
       </TouchableOpacity>
       <View style={tw`my-5`}>
         <Image
-          source={require('../assets/Or.png')}
+          source={require('../../assets/Or.png')}
           style={{alignSelf: 'center'}}
         />
       </View>

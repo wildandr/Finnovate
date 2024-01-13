@@ -3,18 +3,18 @@ import {
   createStackNavigator,
   CardStyleInterpolators,
 } from '@react-navigation/stack';
-import SplashScreen from './src/screens/SplashScreen';
-import OnboardingScreen from './src/screens/OnboardingScreen';
-import RegisterScreen from './src/screens/RegisterScreen';
-import LoginScreen from './src/screens/LoginScreen';
-import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
+import SplashScreen from './src/screens/Root/SplashScreen';
+import OnboardingScreen from './src/screens/Auth/OnboardingScreen';
+import RegisterScreen from './src/screens/Auth/RegisterScreen';
+import LoginScreen from './src/screens/Auth/LoginScreen';
+import ResetPasswordScreen from './src/screens/Profile/ResetPasswordScreen';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import React, {useEffect, useState} from 'react';
-import HomeScreen from './src/screens/HomeScreen';
+import HomeScreen from './src/screens/Home/HomeScreen';
 import MarketScreen from './src/screens/Market/MarketScreen';
 import EducationScreen from './src/screens/Education/EducationScreen';
-import ProfileScreen from './src/screens/ProfileScreen';
+import ProfileScreen from './src/screens/Profile/ProfileScreen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DetailEquity from './src/screens/Market/DetailEquity';
 import News from './src/screens/Market/News';
@@ -23,12 +23,12 @@ import MarketFundamental from './src/screens/Market/MarketFundamental';
 import Course from './src/screens/Education/Course';
 import DetailCourse from './src/screens/Education/DetailCourse';
 
-import PublishScreen from './src/screens/PublishScreen';
+import PublishScreen from './src/screens/Home/PublishScreen';
 import CourseContent from './src/screens/Education/CourseContent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import QuizScreen from './src/screens/Education/QuizScreen';
 import QuizResult from './src/screens/Education/QuizResult';
-import EditProfileScreen from './src/screens/EditProfileScreen';
+import EditProfileScreen from './src/screens/Profile/EditProfileScreen';
 import FollowersScreen from './src/screens/Profile/FollowersScreen';
 
 const RootStack = createStackNavigator();

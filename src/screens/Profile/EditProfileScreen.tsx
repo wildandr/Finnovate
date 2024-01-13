@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import tw from 'tailwind-react-native-classnames';
@@ -37,28 +38,40 @@ const EditProfileScreen = () => {
   ];
 
   const handleSaveChanges = () => {
-    fetch('http://10.0.2.2:3001/users/1/update', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
+    Alert.alert('Update Profile', 'Are you sure you want to save changes?', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
       },
-      body: JSON.stringify({
-        username: username,
-        full_name: fullName,
-        description: description,
-      }),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.text();
-      })
-      .then(data => {
-        console.log(data);
-        navigation.goBack();
-      })
-      .catch(error => console.error(error));
+      {
+        text: 'OK',
+        onPress: () => {
+          fetch('http://10.0.2.2:3001/users/1/update', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              username: username,
+              full_name: fullName,
+              description: description,
+            }),
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.text();
+            })
+            .then(data => {
+              console.log(data);
+              navigation.goBack();
+            })
+            .catch(error => console.error(error));
+        },
+      },
+    ]);
   };
 
   return (
@@ -82,12 +95,12 @@ const EditProfileScreen = () => {
           <TouchableOpacity>
             <Image
               style={styles.bannerImage}
-              source={require('../assets/bgProfile.png')}
+              source={require('../../assets/bgProfile.png')}
             />
           </TouchableOpacity>
           <TouchableOpacity>
             <Image
-              source={require('../assets/avatar2.png')}
+              source={require('../../assets/avatar2.png')}
               style={{
                 width: 90,
                 height: 90,

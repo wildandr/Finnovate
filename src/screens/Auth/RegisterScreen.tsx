@@ -2,9 +2,9 @@ import React, {useState} from 'react';
 import {View, Image, Text, TouchableOpacity, Alert} from 'react-native'; // Import TouchableOpacity
 import {Checkbox} from 'react-native-paper';
 import tw from 'tailwind-react-native-classnames';
-import SignUpButton from '../components/Register_SignUpButton';
-import CustomTextInput from '../components/Register_TextInput';
-import GoogleLoginButton from '../components/GoogleLoginButton';
+import SignUpButton from '../../components/Register_SignUpButton';
+import CustomTextInput from '../../components/Register_TextInput';
+import GoogleLoginButton from '../../components/GoogleLoginButton';
 import {useNavigation} from '@react-navigation/native';
 
 const RegisterScreen: React.FC = () => {
@@ -103,7 +103,7 @@ const RegisterScreen: React.FC = () => {
       <SignUpButton onPress={registerUser} disabled={!isChecked} />
       <View style={tw`my-5`}>
         <Image
-          source={require('../assets/Or.png')}
+          source={require('../../assets/Or.png')}
           style={{alignSelf: 'center'}}
         />
       </View>
