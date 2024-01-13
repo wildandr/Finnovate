@@ -30,6 +30,9 @@ import QuizScreen from './src/screens/Education/QuizScreen';
 import QuizResult from './src/screens/Education/QuizResult';
 import EditProfileScreen from './src/screens/Profile/EditProfileScreen';
 import FollowersScreen from './src/screens/Profile/FollowersScreen';
+import SearchScreen from './src/screens/SearchScreen';
+import DetailPostScreen from './src/screens/DetailPostScreen';
+import CommentPostScreen from './src/screens/CommentPostScreen';
 
 const RootStack = createStackNavigator();
 
@@ -117,6 +120,9 @@ function HomeStackGroup() {
       }}>
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="Publish" component={PublishScreen} />
+      <HomeStack.Screen name="Search" component={SearchScreen} />
+      <HomeStack.Screen name="DetailPost" component={DetailPostScreen} />
+      <HomeStack.Screen name="CommentPost" component={CommentPostScreen} />
     </HomeStack.Navigator>
   );
 }

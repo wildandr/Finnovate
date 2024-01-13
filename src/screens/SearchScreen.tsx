@@ -1,0 +1,31 @@
+import React, { useState } from 'react';
+import { View, TextInput } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import tw from 'tailwind-react-native-classnames';
+import SearchTabNavigator from '../components/SearchTabNavigator'; // Import the SearchTabNavigator
+
+const SearchScreen = () => {
+  const [searchText, setSearchText] = useState('');
+  const navigation = useNavigation();
+
+  return (
+    <View style={[tw`flex-1`, {backgroundColor: '#002351'}]}>
+      <View style={tw`flex-row items-center justify-between p-5`}>
+        <Icon name="arrow-back" size={24} color="white" onPress={() => navigation.goBack()} />
+        <View style={[tw`flex-1 mx-5 rounded-lg px-2 flex-row items-center`, {backgroundColor: '#00112B'}]}>
+          <Icon name="search" size={20} color="white" style={tw`left-1`} />
+          <TextInput
+            style={[tw`flex-1`, {color: 'white', paddingLeft: 20}]}
+            placeholder=" Search feeds, trend"
+            placeholderTextColor="white"
+            onChangeText={text => setSearchText(text)}
+          />
+        </View>
+      </View>
+      <SearchTabNavigator />
+    </View>
+  );
+};
+
+export default SearchScreen;

@@ -77,6 +77,7 @@ const HomeScreen = () => {
           <Icon name="cog" size={24} color="white" />
         </View>
       </View>
+      <TouchableOpacity onPress={() => navigation.navigate('Search')}>
       <View
         style={[
           tw`absolute top-20 rounded-lg px-2 flex-row items-center mx-5`,
@@ -87,9 +88,9 @@ const HomeScreen = () => {
           style={[tw`flex-1`, {color: 'white', paddingLeft: 20}]}
           placeholder=" Search feeds, trend"
           placeholderTextColor="white"
-          onChangeText={text => setSearchText(text)}
         />
       </View>
+    </TouchableOpacity>
 
       <FlatList
         data={filteredData as {post_id: number}[]}
