@@ -6,6 +6,7 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import Entypo from 'react-native-vector-icons/Entypo';
 import moment from 'moment';
 import PredictionCard from './PredictionCard';
+import { useNavigation } from '@react-navigation/native';
 
 function formatTimestamp(timestamp) {
   const time = moment(timestamp);
@@ -28,6 +29,7 @@ function formatTimestamp(timestamp) {
 const FeedItem = ({item}: {item: any}) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(item.likes);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchLikes = async () => {
@@ -59,8 +61,9 @@ const FeedItem = ({item}: {item: any}) => {
   };
 
   return (
+    <TouchableOpacity onPress={() => navigation.navigate('DetailPost', {item})}>
     <View>
-      <View style={[tw`p-4 rounded-md ml-4`, {backgroundColor: '#002351'}]}>
+      <View style={[tw`p-4 rounded-md ml-4 mt-2`, {backgroundColor: '#002351'}]}>
         <View style={tw`flex-row`}>
           <Icon name="user-circle" size={36} color="white" style={tw`mr-2`} />
           <View style={tw`ml-2`}>
@@ -106,13 +109,16 @@ const FeedItem = ({item}: {item: any}) => {
             <Text style={tw`text-white ml-2`}>{likes}</Text>
           </View>
           <View style={tw`flex-row items-center`}>
+            <TouchableOpacity onPress={() => navigation.navigate('CommentPost')}>
             <Fontisto name="comment" size={16} color="white" />
+            </TouchableOpacity>
             <Text style={tw`text-white ml-2`}>{item.comments}</Text>
           </View>
         </View>
       </View>
-      <View style={{height: 1, backgroundColor: '#001736'}} />
+      <View style={[tw`mt-4`,{height: 1, backgroundColor: '#001736'}]} />
     </View>
+    </TouchableOpacity>
   );
 };
 
