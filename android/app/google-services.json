@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "568400098715",
+    "project_id": "finnovate-75d6b",
+    "storage_bucket": "finnovate-75d6b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:568400098715:android:8f26568cbc5d1816081d3e",
+        "android_client_info": {
+          "package_name": "com.finnovate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOXOoHo4kCRe0vSVXkrXHq3w6b2icj49o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

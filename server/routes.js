@@ -577,7 +577,189 @@ app.get('/users/:userId', function (req, res) {
         console.log(error);
         res.status(500).send('An error occurred while fetching user info');
       } else {
-        res.status(200).json(results);
+        res.status(200).json(results[0]);
+      }
+    });
+  });
+});
+
+// Get route for user posts
+app.get('/users/:userId/posts', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const {userId} = req.params;
+
+    const query = `
+      SELECT 
+        Posts.post_id,
+        Posts.user_id,
+        Users.username, 
+        Posts.caption,
+        Posts.post_url,
+        Posts.date_created,
+        Posts.date_updated,
+        Posts.image_path,
+        Posts.analysis_id,
+        PostCards.analysis_id,
+        PostCards.symbol,
+        PostCards.full_name,
+        PostCards.target_price,
+        PostCards.initial_price,
+        PostCards.upside_percentage,
+        PostCards.agree_count,
+        PostCards.disagree_count,
+        PostCards.timing,
+        PostCards.prediction,
+        COUNT(DISTINCT Likes.user_id, Likes.post_id) AS likes,
+        COUNT(DISTINCT Comments.comment_id) AS comments
+      FROM Posts 
+      LEFT JOIN Likes ON Posts.post_id = Likes.post_id
+      LEFT JOIN Comments ON Posts.post_id = Comments.post_id
+      INNER JOIN Users ON Posts.user_id = Users.user_id
+      LEFT JOIN PostCards ON Posts.analysis_id = PostCards.analysis_id
+      WHERE Posts.user_id = ?
+      GROUP BY Posts.post_id
+    `;
+
+    connection.query(query, [userId], (error, results) => {
+      connection.release();
+
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching posts');
+      } else {
+        const transformedResults = results.map(result => {
+          const {
+            analysis_id,
+            symbol,
+            full_name,
+            target_price,
+            initial_price,
+            upside_percentage,
+            agree_count,
+            disagree_count,
+            timing,
+            prediction,
+            ...post
+          } = result;
+          return {
+            ...post,
+            analysis: analysis_id
+              ? {
+                  analysis_id,
+                  symbol,
+                  full_name,
+                  target_price,
+                  initial_price,
+                  upside_percentage,
+                  agree_count,
+                  disagree_count,
+                  timing,
+                  prediction,
+                }
+              : null,
+          };
+        });
+
+        res.status(200).json(transformedResults);
+      }
+    });
+  });
+});
+
+app.get('/users/:userId/posts-with-analysis', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const {userId} = req.params;
+
+    const query = `
+  SELECT 
+    Posts.post_id,
+    Posts.user_id,
+    Users.username, 
+    Posts.caption,
+    Posts.post_url,
+    Posts.date_created,
+    Posts.date_updated,
+    Posts.image_path,
+    Posts.analysis_id,
+    PostCards.analysis_id,
+    PostCards.symbol,
+    PostCards.full_name,
+    PostCards.target_price,
+    PostCards.initial_price,
+    PostCards.upside_percentage,
+    PostCards.agree_count,
+    PostCards.disagree_count,
+    PostCards.timing,
+    PostCards.prediction,
+    COUNT(DISTINCT Likes.user_id, Likes.post_id) AS likes,
+    COUNT(DISTINCT Comments.comment_id) AS comments
+  FROM Posts 
+  LEFT JOIN Likes ON Posts.post_id = Likes.post_id
+  LEFT JOIN Comments ON Posts.post_id = Comments.post_id
+  INNER JOIN Users ON Posts.user_id = Users.user_id
+  INNER JOIN PostCards ON Posts.analysis_id = PostCards.analysis_id
+  WHERE Posts.user_id = ? AND Posts.analysis_id IS NOT NULL
+  GROUP BY Posts.post_id
+`;
+
+    connection.query(query, [userId], (error, results) => {
+      connection.release();
+
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching user posts');
+      } else {
+        // Transform the results to include the analysis object
+        const transformedResults = results.map(result => {
+          const {
+            analysis_id,
+            symbol,
+            full_name,
+            target_price,
+            initial_price,
+            upside_percentage,
+            agree_count,
+            disagree_count,
+            timing,
+            prediction,
+            ...post
+          } = result;
+          return {
+            ...post,
+            analysis: analysis_id
+              ? {
+                  analysis_id,
+                  symbol,
+                  full_name,
+                  target_price,
+                  initial_price,
+                  upside_percentage,
+                  agree_count,
+                  disagree_count,
+                  timing,
+                  prediction,
+                }
+              : null,
+          };
+        });
+
+        res.status(200).json(transformedResults);
       }
     });
   });
@@ -737,6 +919,54 @@ app.post('/postcards', (req, res) => {
       });
     },
   );
+});
+
+// PUT route for updating user info
+app.put('/users/:userId/update', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const {userId} = req.params;
+    const {username, full_name, description} = req.body;
+
+    let query = 'UPDATE Users SET date_updated = NOW(),';
+    let queryParams = [];
+
+    if (username) {
+      query += ' username = ?,';
+      queryParams.push(username);
+    }
+
+    if (full_name) {
+      query += ' full_name = ?,';
+      queryParams.push(full_name);
+    }
+
+    if (description) {
+      query += ' description = ?,';
+      queryParams.push(description);
+    }
+
+    query = query.slice(0, -1) + ' WHERE user_id = ?';
+    queryParams.push(userId);
+
+    connection.query(query, queryParams, (error, results) => {
+      connection.release();
+
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while updating user info');
+      } else {
+        res.status(200).send('User info updated successfully');
+      }
+    });
+  });
 });
 
 app.listen(3001, () => {
