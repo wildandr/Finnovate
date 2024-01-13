@@ -29,8 +29,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import QuizScreen from './src/screens/Education/QuizScreen';
 import QuizResult from './src/screens/Education/QuizResult';
 import EditProfileScreen from './src/screens/EditProfileScreen';
-import FollowersScreen from './src/screens/FollowersScreen';
-
+import FollowersScreen from './src/screens/Profile/FollowersScreen';
 
 const RootStack = createStackNavigator();
 
@@ -221,8 +220,8 @@ export default function Navigation() {
 
   const logout = async () => {
     // command untuk skip login
-    await AsyncStorage.removeItem('isLoggedIn'); 
-    
+    await AsyncStorage.removeItem('isLoggedIn');
+
     setIsLoggedin(false);
   };
 
