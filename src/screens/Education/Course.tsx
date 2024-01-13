@@ -1,4 +1,3 @@
-// Course.js
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -6,7 +5,6 @@ import tw from 'tailwind-react-native-classnames';
 import { courses } from '../../data/courses';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { ScrollView } from 'react-native-gesture-handler';
 
 export type EducationTopTabParamList = {
   Discover: undefined;
@@ -37,11 +35,10 @@ const Course = ({ route, navigation }: Props) => {
     ? courses.filter((course) => course.category === category)
     : courses;
 
-    const handlePress = (course: any) => {
-        const courseIndex = courses.findIndex((c) => c.id === course.id);
-        navigation.navigate('DetailCourse', { courseIndex });
-      };
-      
+  const handlePress = (course: any) => {
+    const courseIndex = courses.findIndex((c) => c.id === course.id);
+    navigation.navigate('DetailCourse', { courseIndex });
+  };
 
   const renderCourseItem = ({ item }: { item: typeof courses[number] }) => (
     <TouchableOpacity onPress={() => handlePress(item)}>
@@ -64,15 +61,12 @@ const Course = ({ route, navigation }: Props) => {
   );
 
   return (
-    <View style={[tw`h-full px-4 pb-5`, { backgroundColor: '#002351' }]}>
-        <ScrollView>
-      <FlatList
-        data={filteredCourses}
-        keyExtractor={(item) => item.id}
-        renderItem={renderCourseItem}
-      />
-      </ScrollView>
-    </View>
+    <FlatList
+      style={[tw`h-full  px-4 pb-5`, { backgroundColor: '#002351' }]}
+      data={filteredCourses}
+      keyExtractor={(item) => item.id}
+      renderItem={renderCourseItem}
+    />
   );
 };
 

@@ -32,6 +32,7 @@ const EducationTopTab = () => (
         borderRadius: 1,
         backgroundColor: "#002351",
         elevation: 0,
+        marginBottom: 5,
       },
     })}
   >
