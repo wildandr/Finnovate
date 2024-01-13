@@ -21,7 +21,7 @@ const SplashScreen: React.FC = () => {
         ...tw`flex-1 items-center justify-center`,
         backgroundColor: '#002351',
       }}>
-      <Image source={require('../assets/finnovate_logo.png')} />
+      <Image source={require('../../assets/finnovate_logo.png')} />
       <ActivityIndicator size="large" color="grey" style={tw`mt-10`} />
     </View>
   );

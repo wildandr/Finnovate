@@ -8,11 +8,11 @@ import {
   RefreshControl,
 } from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import Stat from '../components/StatistikProfile';
-import EditProfileButton from '../components/EditProfileButton';
-import ProfileTabNavigator from '../components/ProfileTabNavigator';
+import Stat from '../../components/StatistikProfile';
+import EditProfileButton from '../../components/EditProfileButton';
+import ProfileTabNavigator from '../../components/ProfileTabNavigator';
 import tw from 'tailwind-react-native-classnames';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -53,6 +53,12 @@ const ProfileScreen = () => {
     fetchData();
   }, [fetchData]);
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, []),
+  );
+
   return (
     <ScrollView
       contentContainerStyle={styles.container}
@@ -63,10 +69,10 @@ const ProfileScreen = () => {
         <View style={{position: 'relative'}}>
           <Image
             style={styles.bannerImage}
-            source={require('../assets/bgProfile.png')}
+            source={require('../../assets/bgProfile.png')}
           />
           <Image
-            source={require('../assets/avatar2.png')}
+            source={require('../../assets/avatar2.png')}
             style={{
               width: 90,
               height: 90,

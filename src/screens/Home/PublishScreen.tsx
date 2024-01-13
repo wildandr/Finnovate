@@ -10,11 +10,11 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import tw from 'tailwind-react-native-classnames';
-import PublishButton from '../components/PublishButton';
+import PublishButton from '../../components/PublishButton';
 import {useNavigation} from '@react-navigation/native';
-import ShareButton from '../components/ShareButton';
-import TradingPlanCard from '../components/TradingPlanCard';
-import PublishImageCard from '../components/PublishImageCard';
+import ShareButton from '../../components/ShareButton';
+import TradingPlanCard from '../../components/TradingPlanCard';
+import PublishImageCard from '../../components/PublishImageCard';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 
