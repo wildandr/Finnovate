@@ -10,20 +10,7 @@ import {useNavigation} from '@react-navigation/native';
 
 function formatTimestamp(timestamp) {
   const time = moment(timestamp);
-  const now = moment();
-  const diffMinutes = now.diff(time, 'minutes');
-  const diffHours = now.diff(time, 'hours');
-  const diffDays = now.diff(time, 'days');
-
-  if (diffMinutes < 60) {
-    return `${diffMinutes} minutes ago`;
-  } else if (diffHours < 24) {
-    return `${diffHours} hours ago`;
-  } else if (diffDays === 1) {
-    return 'Yesterday';
-  } else {
-    return time.format('YYYY-MM-DD HH:mm');
-  }
+  return time.format('HH:mm ᐧ DD MMM YY');
 }
 
 const FeedDetailItem = ({item}: {item: any}) => {
@@ -96,6 +83,9 @@ const FeedDetailItem = ({item}: {item: any}) => {
           )}
           {item.analysis && <PredictionCard analysis={item.analysis} />}
 
+          <View style={tw`flex-row justify-between items-center mb-3`}>
+            <Text style={tw`text-gray-400`}>{formatTimestamp(item.date)}</Text>
+          </View>
           <View style={tw`flex-row`}>
             <View style={tw`flex-row items-center mr-4`}>
               <TouchableOpacity onPress={handleLike}>
@@ -116,7 +106,7 @@ const FeedDetailItem = ({item}: {item: any}) => {
             </View>
           </View>
         </View>
-        <View style={[tw`mt-4`, {height: 1, backgroundColor: '#001736'}]} />
+        <View style={[tw`mt-0`, {height: 1, backgroundColor: '#001736'}]} />
       </View>
     </TouchableOpacity>
   );
