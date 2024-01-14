@@ -16,8 +16,8 @@ import ShareButton from '../../components/ShareButton';
 import TradingPlanCard from '../../components/TradingPlanCard';
 import PublishImageCard from '../../components/PublishImageCard';
 import ImagePicker from 'react-native-image-crop-picker';
-import storage from '@react-native-firebase/storage';
 import supabase from '../../../server/supabaseClient';
+import {decode} from 'base64-arraybuffer';
 
 const PublishScreen = () => {
   const [content, setContent] = useState('');
@@ -26,36 +26,50 @@ const PublishScreen = () => {
   const navigation = useNavigation();
 
   const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
 
   const openImagePicker = () => {
     ImagePicker.openPicker({
       width: 300,
       height: 400,
       cropping: false,
-    }).then(async image => {
-      setImage({uri: image.path});
+      includeBase64: true,
+    }).then(async pickedImage => {
+      setImage({uri: pickedImage.path});
 
       const timestamp = Date.now();
       const uniqueSign = Math.floor(Math.random() * 1000);
       const fileName = `imagePost_${timestamp}_${uniqueSign}.jpg`;
 
+      const base64FileData = pickedImage.data;
+
       const file = {
-        uri: image.path,
+        uri: pickedImage.path,
         name: fileName,
         type: 'image/jpeg',
       };
 
       const bucketId = 'post_photo';
-      const {error} = await supabase.storage
+      const {data, error} = await supabase.storage
         .from(bucketId)
-        .upload(file.name, file);
+        .upload(file.name, decode(base64FileData), {
+          contentType: 'image/jpg',
+        });
 
       if (error) {
         console.error('Error uploading image: ', error);
+        setImageUrl(null);
       } else {
-        const imageUrl = supabase.storage.from(bucketId).getPublicUrl(fileName);
-        console.log('Image uploaded successfully');
-        console.log(imageUrl);
+        const urlResponse = await supabase.storage
+          .from(bucketId)
+          .getPublicUrl(file.name);
+
+        if (urlResponse.error) {
+          console.error('Error getting image URL: ', urlResponse.error);
+        } else {
+          console.log('Image URL: ', urlResponse.data.publicUrl);
+          setImageUrl(urlResponse.data.publicUrl);
+        }
       }
     });
   };
@@ -108,7 +122,7 @@ const PublishScreen = () => {
           user_id: 1,
           caption: content,
           post_url: null,
-          image_path: null,
+          image_path: imageUrl,
           analysis_id,
         }),
       });

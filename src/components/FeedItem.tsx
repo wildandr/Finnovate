@@ -7,6 +7,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import moment from 'moment';
 import PredictionCard from './PredictionCard';
 import {useNavigation} from '@react-navigation/native';
+import supabase from '../../server/supabaseClient';
 
 function formatTimestamp(timestamp) {
   const time = moment(timestamp);
@@ -29,6 +30,7 @@ function formatTimestamp(timestamp) {
 const FeedItem = ({item}: {item: any}) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(item.likes);
+  const [imageUrl, setimageUrl] = useState(null);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -98,7 +100,7 @@ const FeedItem = ({item}: {item: any}) => {
           )}
           {item.analysis && <PredictionCard analysis={item.analysis} />}
 
-          <View style={tw`flex-row`}>
+          <View style={tw`flex-row mt-3`}>
             <View style={tw`flex-row items-center mr-4`}>
               <TouchableOpacity onPress={handleLike}>
                 <Icon
@@ -120,7 +122,7 @@ const FeedItem = ({item}: {item: any}) => {
             </View>
           </View>
         </View>
-        <View style={[tw`mt-4`, {height: 1, backgroundColor: '#001736'}]} />
+        <View style={[tw`mt-2`, {height: 1, backgroundColor: '#001736'}]} />
       </View>
     </TouchableOpacity>
   );
