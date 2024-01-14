@@ -17,6 +17,7 @@ import TradingPlanCard from '../../components/TradingPlanCard';
 import PublishImageCard from '../../components/PublishImageCard';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
+import supabase from '../../../server/supabaseClient';
 
 const PublishScreen = () => {
   const [content, setContent] = useState('');
@@ -31,8 +32,31 @@ const PublishScreen = () => {
       width: 300,
       height: 400,
       cropping: false,
-    }).then(image => {
+    }).then(async image => {
       setImage({uri: image.path});
+
+      const timestamp = Date.now();
+      const uniqueSign = Math.floor(Math.random() * 1000);
+      const fileName = `imagePost_${timestamp}_${uniqueSign}.jpg`;
+
+      const file = {
+        uri: image.path,
+        name: fileName,
+        type: 'image/jpeg',
+      };
+
+      const bucketId = 'post_photo';
+      const {error} = await supabase.storage
+        .from(bucketId)
+        .upload(file.name, file);
+
+      if (error) {
+        console.error('Error uploading image: ', error);
+      } else {
+        const imageUrl = supabase.storage.from(bucketId).getPublicUrl(fileName);
+        console.log('Image uploaded successfully');
+        console.log(imageUrl);
+      }
     });
   };
 

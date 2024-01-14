@@ -1,12 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, Image, TextInput, FlatList} from 'react-native';
-import {Link} from 'react-router-native';
+import {View, Text, TextInput, FlatList} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {useNavigation} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {TouchableOpacity} from 'react-native';
-import DetailEquity from './DetailEquity';
 import {equities} from '../../data/equities';
 import Equity from '../../components/Equity';
 import {SafeAreaView} from 'react-native-safe-area-context';
