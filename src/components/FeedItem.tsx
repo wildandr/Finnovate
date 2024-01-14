@@ -6,7 +6,7 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import Entypo from 'react-native-vector-icons/Entypo';
 import moment from 'moment';
 import PredictionCard from './PredictionCard';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 function formatTimestamp(timestamp) {
   const time = moment(timestamp);
@@ -62,62 +62,66 @@ const FeedItem = ({item}: {item: any}) => {
 
   return (
     <TouchableOpacity onPress={() => navigation.navigate('DetailPost', {item})}>
-    <View>
-      <View style={[tw`p-4 rounded-md ml-4 mt-2`, {backgroundColor: '#002351'}]}>
-        <View style={tw`flex-row`}>
-          <Icon name="user-circle" size={36} color="white" style={tw`mr-2`} />
-          <View style={tw`ml-2`}>
-            <Text style={tw`font-bold text-white`}>{item.username}</Text>
-            <Text style={tw`text-white`}>
-              {formatTimestamp(item.date_created)}
-            </Text>
-          </View>
-          <Entypo
-            name="dots-three-vertical"
-            size={16}
-            color="white"
-            style={tw`ml-auto`}
-          />
-        </View>
-        <Text style={tw`text-white my-3`}>{item.caption}</Text>
-        {item.image_path && (
-          <View
-            style={{
-              width: 200,
-              height: 200,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Image
-              source={{uri: item.image_path}}
-              resizeMode="cover"
-              style={{width: '100%', height: '100%'}}
+      <View>
+        <View
+          style={[tw`p-4 rounded-md ml-4 mt-2`, {backgroundColor: '#002351'}]}>
+          <View style={tw`flex-row`}>
+            <Icon name="user-circle" size={36} color="white" style={tw`mr-2`} />
+            <View style={tw`ml-2`}>
+              <Text style={tw`font-bold text-white`}>{item.username}</Text>
+              <Text style={tw`text-white`}>
+                {formatTimestamp(item.date_created)}
+              </Text>
+            </View>
+            <Entypo
+              name="dots-three-vertical"
+              size={16}
+              color="white"
+              style={tw`ml-auto`}
             />
           </View>
-        )}
-        {item.analysis && <PredictionCard analysis={item.analysis} />}
-
-        <View style={tw`flex-row`}>
-          <View style={tw`flex-row items-center mr-4`}>
-            <TouchableOpacity onPress={handleLike}>
-              <Icon
-                name={isLiked ? 'heart' : 'heart-o'}
-                size={16}
-                color="white"
+          <Text style={tw`text-white my-3`}>{item.caption}</Text>
+          {item.image_path && (
+            <View
+              style={{
+                width: 200,
+                height: 200,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Image
+                source={{uri: item.image_path}}
+                resizeMode="cover"
+                style={{width: '100%', height: '100%'}}
               />
-            </TouchableOpacity>
-            <Text style={tw`text-white ml-2`}>{likes}</Text>
-          </View>
-          <View style={tw`flex-row items-center`}>
-            <TouchableOpacity onPress={() => navigation.navigate('CommentPost')}>
-            <Fontisto name="comment" size={16} color="white" />
-            </TouchableOpacity>
-            <Text style={tw`text-white ml-2`}>{item.comments}</Text>
+            </View>
+          )}
+          {item.analysis && <PredictionCard analysis={item.analysis} />}
+
+          <View style={tw`flex-row`}>
+            <View style={tw`flex-row items-center mr-4`}>
+              <TouchableOpacity onPress={handleLike}>
+                <Icon
+                  name={isLiked ? 'heart' : 'heart-o'}
+                  size={16}
+                  color="white"
+                />
+              </TouchableOpacity>
+              <Text style={tw`text-white ml-2`}>{likes}</Text>
+            </View>
+            <View style={tw`flex-row items-center`}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('CommentPost', {postId: item.post_id})
+                }>
+                <Fontisto name="comment" size={16} color="white" />
+              </TouchableOpacity>
+              <Text style={tw`text-white ml-2`}>{item.comments}</Text>
+            </View>
           </View>
         </View>
+        <View style={[tw`mt-4`, {height: 1, backgroundColor: '#001736'}]} />
       </View>
-      <View style={[tw`mt-4`,{height: 1, backgroundColor: '#001736'}]} />
-    </View>
     </TouchableOpacity>
   );
 };

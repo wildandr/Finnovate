@@ -12,38 +12,40 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Import M
 import tw from 'tailwind-react-native-classnames';
 import PublishButton from '../../components/PublishButton';
 import {useNavigation} from '@react-navigation/native';
-import ShareButton from '../../components/ShareButton';
-import TradingPlanCard from '../../components/TradingPlanCard';
-import PublishImageCard from '../../components/PublishImageCard';
 
-const PublishScreen = () => {
+const CommentPostScreen = ({route}) => {
+  const {postId} = route.params;
   const [content, setContent] = useState('');
   const [showTradingPlanCard, setShowTradingPlanCard] = useState(false);
   const navigation = useNavigation();
 
-  const publishPost = async () => {
+  const publishComment = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:3001/new-post', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `http://10.0.2.2:3001/posts/${postId}/comments`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: 1,
+            content: content,
+          }),
         },
-        body: JSON.stringify({
-          user_id: 1, // TODO: replace with actual user_id
-          caption: content,
-          post_url: null,
-          image_path: null,
-        }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error('HTTP error ' + response.status);
       }
 
-      Alert.alert('Post published', 'Your post was published successfully');
+      Alert.alert(
+        'Comment published',
+        'Your comment was published successfully',
+      );
       navigation.goBack();
     } catch (error) {
-      console.error('Failed to publish post:', error);
+      console.error('Failed to publish comment:', error);
     }
   };
 
@@ -58,7 +60,7 @@ const PublishScreen = () => {
             <Text style={tw`text-2xl text-white`}>Comment Post</Text>
           </View>
           <View style={tw`w-24`}>
-            <PublishButton onPress={publishPost} />
+            <PublishButton onPress={publishComment} />
           </View>
         </View>
         <View style={tw`flex-row items-center mt-4`}>
@@ -84,4 +86,4 @@ const PublishScreen = () => {
   );
 };
 
-export default PublishScreen;
+export default CommentPostScreen;
