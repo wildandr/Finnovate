@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, Text, Image, TextInput} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, Text, Image, TextInput, FlatList} from 'react-native';
 import {Link} from 'react-router-native';
 import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -10,8 +10,31 @@ import DetailEquity from './DetailEquity';
 import {equities} from '../../data/equities';
 import Equity from '../../components/Equity';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import NewsItem from '../../components/News';
 
 const MarketScreen = () => {
+  const [newsData, setNewsData] = useState([]);
+
+  useEffect(() => {
+    const fetchNewsData = async () => {
+      try {
+        const response = await fetch(
+          'https://berita-indo-api-next.vercel.app/api/cnbc-news/market',
+        );
+        const data = await response.json();
+
+        if (data && data.data) {
+          const latestNews = data.data.slice(0, 10);
+          setNewsData(latestNews);
+        }
+      } catch (error) {
+        console.error('Error fetching news data:', error);
+      }
+    };
+
+    fetchNewsData();
+  }, []);
+
   return (
     <SafeAreaView style={[tw`flex-1 px-4`, {backgroundColor: '#002351'}]}>
       <View
@@ -36,56 +59,12 @@ const MarketScreen = () => {
       <Text style={tw`text-white mt-14 text-base font-medium`}>
         Latest news
       </Text>
-      <View style={[tw` flex-row mt-3 items-center `]}>
-        <Image
-          source={require('../../assets/img1.jpg')}
-          style={tw`w-16 h-16 rounded-lg`}
-        />
-        <View style={[tw`ml-2 w-3/4`]}>
-          <Text
-            style={[
-              tw`text-white font-semibold`,
-              {color: '#FFBC00', fontSize: 7},
-            ]}>
-            4 Jan 2024
-          </Text>
-          <Text
-            style={[
-              tw`text-white font-bold mt-1`,
-              {color: 'white', fontSize: 12, flexShrink: 1},
-            ]}>
-            Insurtech startup PasarPolis gets $54 million — Series B
-          </Text>
-          <Text style={[tw`text-white `, {color: '#CBD5E1', fontSize: 8}]}>
-            Insurtech startup PasarPolis gets $54 million — Series B
-          </Text>
-        </View>
-      </View>
-      <View style={[tw` flex-row mt-3 items-center `]}>
-        <Image
-          source={require('../../assets/img1.jpg')}
-          style={tw`w-16 h-16 rounded-lg`}
-        />
-        <View style={[tw`ml-2 w-3/4`]}>
-          <Text
-            style={[
-              tw`text-white font-semibold`,
-              {color: '#FFBC00', fontSize: 7},
-            ]}>
-            4 Jan 2024
-          </Text>
-          <Text
-            style={[
-              tw`text-white font-bold mt-1`,
-              {color: 'white', fontSize: 12, flexShrink: 1},
-            ]}>
-            Insurtech startup PasarPolis gets $54 million — Series B
-          </Text>
-          <Text style={[tw`text-white `, {color: '#CBD5E1', fontSize: 8}]}>
-            Insurtech startup PasarPolis gets $54 million — Series B
-          </Text>
-        </View>
-      </View>
+      <FlatList
+        data={newsData}
+        renderItem={({item}) => <NewsItem item={item} />}
+        keyExtractor={item => item.title}
+        style={tw`mb-2`}
+      />
     </SafeAreaView>
   );
 };
