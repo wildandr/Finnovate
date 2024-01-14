@@ -150,6 +150,7 @@ const PublishScreen = () => {
           </View>
           <View style={tw`w-24`}>
             <PublishButton
+              disabled={content.trim() === ''}
               onPress={async () => {
                 if (showTradingPlanCard) {
                   const analysis_id = await publishPostCard();

@@ -85,12 +85,15 @@ const FeedItem = ({item}: {item: any}) => {
           <Text style={tw`text-white my-3`}>{item.caption}</Text>
           {item.image_path && (
             <View
-              style={{
-                width: 200,
-                height: 200,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
+              style={[
+                tw`text-white mb-3`,
+                {
+                  width: 200,
+                  height: 200,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
+              ]}>
               <Image
                 source={{uri: item.image_path}}
                 resizeMode="cover"
