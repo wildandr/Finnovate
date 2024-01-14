@@ -29,7 +29,7 @@ app.get('/posts', function (req, res) {
     }
 
     const query = `
-  SELECT Posts.*, Users.username, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+  SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
   FROM Posts
   LEFT JOIN Likes ON Posts.post_id = Likes.post_id
   LEFT JOIN Comments ON Posts.post_id = Comments.post_id

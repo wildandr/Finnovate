@@ -60,71 +60,65 @@ const ProfileScreen = () => {
   );
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={fetchData} />
-      }>
-      <View style={styles.container}>
-        <View style={{position: 'relative'}}>
-          <Image
-            style={styles.bannerImage}
-            source={require('../../assets/bgProfile.png')}
-          />
-          <Image
-            source={require('../../assets/avatar2.png')}
-            style={{
-              width: 90,
-              height: 90,
-              borderRadius: 30,
-              position: 'absolute',
-              bottom: -40,
-              left: 10,
-            }}
-          />
-        </View>
-        <View style={tw`flex-row ml-52 w-60 mt-2`}>
-          <Stat
-            number={75}
-            title="Win rate"
-            onPress={() => {}}
-            style={tw`mr-2`}
-          />
-          <Stat
-            number={userData?.posts_count}
-            title="Posts"
-            onPress={() => {}}
-            style={tw`mx-2`}
-          />
-          <Stat
-            number={userData?.followers_count}
-            title="Followers"
-            style={tw`ml-2`}
-            onPress={() => navigation.navigate('Followers')}
-          />
-        </View>
-        <View style={tw`flex-row items-start mt-2 ml-4`}>
-          <View style={tw`mr-4`}>
-            <Text style={tw`text-xl font-bold text-white`}>
-              {userData?.full_name}
-            </Text>
-            <Text style={tw`text-base text-yellow-400 font-bold`}>
-              @{userData?.username}
-            </Text>
-            <Text style={tw`text-base text-white mt-2 mb-8`}>
-              {userData?.description}
-            </Text>
-          </View>
-          <View style={tw`flex-1 items-end`}>
-            <EditProfileButton
-              style={tw`mr-4`}
-              onPress={() => navigation.navigate('EditProfile')}
-            />
-          </View>
-        </View>
-        <ProfileTabNavigator />
+    <View style={styles.container}>
+      <View style={{position: 'relative'}}>
+        <Image
+          style={styles.bannerImage}
+          source={require('../../assets/bgProfile.png')}
+        />
+        <Image
+          source={require('../../assets/avatar2.png')}
+          style={{
+            width: 90,
+            height: 90,
+            borderRadius: 30,
+            position: 'absolute',
+            bottom: -40,
+            left: 10,
+          }}
+        />
       </View>
-    </ScrollView>
+      <View style={tw`flex-row ml-52 w-60 mt-2`}>
+        <Stat
+          number={75}
+          title="Win rate"
+          onPress={() => {}}
+          style={tw`mr-2`}
+        />
+        <Stat
+          number={userData?.posts_count}
+          title="Posts"
+          onPress={() => {}}
+          style={tw`mx-2`}
+        />
+        <Stat
+          number={userData?.followers_count}
+          title="Followers"
+          style={tw`ml-2`}
+          onPress={() => navigation.navigate('Followers')}
+        />
+      </View>
+      <View style={tw`flex-row items-start mt-2 ml-4`}>
+        <View style={tw`mr-4`}>
+          <Text style={tw`text-xl font-bold text-white`}>
+            {userData?.full_name}
+          </Text>
+          <Text style={tw`text-base text-yellow-400 font-bold`}>
+            @{userData?.username}
+          </Text>
+          <Text style={tw`text-base text-white mt-2 mb-8`}>
+            {userData?.description}
+          </Text>
+        </View>
+        <View style={tw`flex-1 items-end`}>
+          <EditProfileButton
+            style={tw`mr-4`}
+            onPress={() => navigation.navigate('EditProfile')}
+          />
+        </View>
+      </View>
+      <ProfileTabNavigator />
+    </View>
   );
 };
 
