@@ -24,8 +24,9 @@ const EducationScreen = () => {
           Dive into the World of Smart Investing with <Text style={[tw``, { color: '#FFBC00' }]}>Finnovate!</Text>
         </Text>
       </View>
-    
+   
       < EducationTopTab/>
+ 
     
     </SafeAreaView>
   );

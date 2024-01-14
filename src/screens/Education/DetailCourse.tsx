@@ -60,7 +60,7 @@ const DetailCourse = ({ route }: Props) => {
       </View>
       <ScrollView>
         <Image
-          source={require('../../assets/course1.png')}
+          source={selectedCourse.image}
           style={tw`w-48 mt-5 h-40 mx-auto `}
         />
         <View style={[tw`px-5 mt-5  `]}>
