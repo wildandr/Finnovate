@@ -1,8 +1,8 @@
 import React from 'react';
 import {View, FlatList} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
-import FeedItem from '../components/FeedItem';
-import CommentItem from '../components/CommentItem';
+import FeedItem from '../../components/FeedItem';
+import CommentItem from '../../components/CommentItem';
 
 const CommentScreen = () => {
   const feedData = [

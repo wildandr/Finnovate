@@ -48,23 +48,6 @@ const HomeScreen = () => {
     fetchData();
   }, [fetchData]);
 
-  const filteredData = feedData.filter(
-    (item: any) =>
-      (item.caption &&
-        item.caption.toLowerCase().includes(searchText.toLowerCase())) ||
-      (item.username &&
-        item.username.toLowerCase().includes(searchText.toLowerCase())) ||
-      (item.analysis &&
-        item.analysis.symbol &&
-        item.analysis.symbol
-          .toLowerCase()
-          .includes(searchText.toLowerCase())) ||
-      (item.analysis &&
-        item.analysis.full_name &&
-        item.analysis.full_name
-          .toLowerCase()
-          .includes(searchText.toLowerCase())),
-  );
   return (
     <View style={[tw`flex-1`, {backgroundColor: '#002351'}]}>
       <View
@@ -78,22 +61,25 @@ const HomeScreen = () => {
         </View>
       </View>
       <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-      <View
-        style={[
-          tw`absolute top-20 rounded-lg px-2 flex-row items-center mx-5`,
-          {backgroundColor: '#00112B'},
-        ]}>
-        <Icon name="search" size={20} color="white" style={tw`left-1`} />
-        <TextInput
-          style={[tw`flex-1`, {color: 'white', paddingLeft: 20}]}
-          placeholder=" Search feeds, trend"
-          placeholderTextColor="white"
-        />
-      </View>
-    </TouchableOpacity>
+        <View
+          style={[
+            tw`absolute top-20 rounded-lg px-2 flex-row items-center mx-5`,
+            {backgroundColor: '#00112B'},
+          ]}>
+          <Icon name="search" size={20} color="white" style={tw`left-1`} />
+          <TextInput
+            style={[tw`flex-1`, {color: 'white', paddingLeft: 20}]}
+            placeholder=" Search feeds, trend"
+            placeholderTextColor="white"
+            onChangeText={text => setSearchText(text)}
+            onSubmitEditing={() => navigation.navigate('Search', {searchText})}
+            returnKeyType="search"
+          />
+        </View>
+      </TouchableOpacity>
 
       <FlatList
-        data={filteredData as {post_id: number}[]}
+        data={feedData as {post_id: number}[]}
         keyExtractor={item => item.post_id.toString()}
         renderItem={({item}) => <FeedItem item={item} />}
         style={tw`mt-40`}

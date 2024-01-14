@@ -30,9 +30,9 @@ import QuizScreen from './src/screens/Education/QuizScreen';
 import QuizResult from './src/screens/Education/QuizResult';
 import EditProfileScreen from './src/screens/Profile/EditProfileScreen';
 import FollowersScreen from './src/screens/Profile/FollowersScreen';
-import SearchScreen from './src/screens/SearchScreen';
-import DetailPostScreen from './src/screens/DetailPostScreen';
-import CommentPostScreen from './src/screens/CommentPostScreen';
+import SearchScreen from './src/screens/Search/SearchScreen';
+import DetailPostScreen from './src/screens/Detail/DetailPostScreen';
+import CommentPostScreen from './src/screens/Detail/CommentPostScreen';
 
 const RootStack = createStackNavigator();
 
