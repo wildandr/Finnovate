@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, FlatList, Image} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import tw from 'tailwind-react-native-classnames';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SearchTextContext from '../../contexts/SearchTextContext';
 
 interface ItemProps {
   full_name: string;
@@ -60,12 +61,12 @@ const Item = ({
   </View>
 );
 
-const AccountScreen = ({route}) => {
+const AccountScreen = () => {
   const navigation = useNavigation();
   const [data, setData] = useState<ItemProps[]>([]);
   const [followings, setFollowings] = useState<any[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
-  const searchText = route.params.searchText;
+  const searchText = useContext(SearchTextContext);
   console.log('searchTextPopular:', searchText);
 
   useEffect(() => {

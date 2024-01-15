@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -15,13 +15,14 @@ import PlusButton from '../../components/PlusButton';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
+import SearchTextContext from '../../contexts/SearchTextContext';
 
-const AnalysisScreen = ({route}) => {
+const AnalysisScreen = () => {
   const navigation = useNavigation();
   const [feedData, setFeedData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoggedin, setIsLoggedin] = useState(false);
-  const searchText = route.params.searchText;
+  const searchText = useContext(SearchTextContext);
 
   useEffect(() => {
     fetchData();
