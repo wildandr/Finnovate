@@ -13,7 +13,7 @@ const LoginButton: React.FC<LoginButtonProps> = ({onPress}) => {
     <TouchableOpacity
       style={[
         styles.button,
-        tw`h-16 w-3/4 rounded-lg justify-center items-center`,
+        tw`h-16 w-96 rounded-lg justify-center items-center`,
       ]}
       onPress={onPress}>
       <Text style={tw`text-white text-lg`}>Sign In</Text>

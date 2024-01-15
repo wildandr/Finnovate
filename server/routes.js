@@ -478,8 +478,8 @@ app.post('/users/login', async function (req, res) {
           );
 
           if (comparison) {
-            // Return the desired data
             res.status(200).json({
+              user_id: results[0].user_id,
               email: results[0].email,
               username: results[0].username,
               full_name: results[0].full_name,
@@ -1308,6 +1308,7 @@ app.get('/search-latest', function (req, res) {
   });
 });
 
+// Note for search users connect with userId
 app.get('/search-users', function (req, res) {
   connection.getConnection(function (err, connection) {
     if (err) {

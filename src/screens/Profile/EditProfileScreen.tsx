@@ -11,6 +11,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
@@ -22,14 +23,19 @@ const EditProfileScreen = () => {
   const [isChanged, setIsChanged] = useState(false);
 
   useEffect(() => {
-    fetch('http://10.0.2.2:3001/users/1')
-      .then(response => response.json())
-      .then(data => {
-        setUsername(data.username);
-        setFullName(data.full_name);
-        setDescription(data.description);
-      })
-      .catch(error => console.error(error));
+    const fetchUser = async () => {
+      const storedUserId = await AsyncStorage.getItem('user_id');
+      fetch(`http://10.0.2.2:3001/users/${storedUserId}`)
+        .then(response => response.json())
+        .then(data => {
+          setUsername(data.username);
+          setFullName(data.full_name);
+          setDescription(data.description);
+        })
+        .catch(error => console.error(error));
+    };
+
+    fetchUser();
   }, []);
 
   const handleInputChange = (text, setter) => [
@@ -37,7 +43,9 @@ const EditProfileScreen = () => {
     setIsChanged(true),
   ];
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
+    const storedUserId = await AsyncStorage.getItem('user_id');
+
     Alert.alert('Update Profile', 'Are you sure you want to save changes?', [
       {
         text: 'Cancel',
@@ -47,7 +55,7 @@ const EditProfileScreen = () => {
       {
         text: 'OK',
         onPress: () => {
-          fetch('http://10.0.2.2:3001/users/1/update', {
+          fetch(`http://10.0.2.2:3001/users/${storedUserId}/update`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
