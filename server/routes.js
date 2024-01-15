@@ -264,21 +264,31 @@ app.get('/posts/:postId/comments', function (req, res) {
     const {postId} = req.params;
 
     const mainCommentsQuery = `
-      SELECT 
-        Comments.*, 
-        (SELECT COUNT(*) FROM CommentLikes WHERE CommentLikes.comment_id = Comments.comment_id) AS likes_count,
-        (SELECT COUNT(*) FROM Comments AS Replies WHERE Replies.parent_comment_id = Comments.comment_id) AS replies_count
-      FROM Comments 
-      WHERE post_id = ? AND parent_comment_id IS NULL
-    `;
+  SELECT 
+    Comments.*, 
+    Users.username AS commenter_username,
+    Users.full_name AS commenter_full_name,
+    Users.profile_picture_url AS commenter_profile_picture,
+    (SELECT username FROM Users WHERE Users.user_id = (SELECT user_id FROM Posts WHERE Posts.post_id = Comments.post_id)) AS post_owner_username,
+    (SELECT COUNT(*) FROM CommentLikes WHERE CommentLikes.comment_id = Comments.comment_id) AS likes_count,
+    (SELECT COUNT(*) FROM Comments AS Replies WHERE Replies.parent_comment_id = Comments.comment_id) AS replies_count
+  FROM Comments 
+  JOIN Users ON Comments.user_id = Users.user_id
+  WHERE post_id = ? AND parent_comment_id IS NULL
+`;
 
     const repliesQuery = `
-      SELECT 
-        Comments.*, 
-        (SELECT COUNT(*) FROM CommentLikes WHERE CommentLikes.comment_id = Comments.comment_id) AS likes_count
-      FROM Comments 
-      WHERE post_id = ? AND parent_comment_id IS NOT NULL
-    `;
+  SELECT 
+    Comments.*, 
+    Users.username AS commenter_username,
+    Users.full_name AS commenter_full_name,
+    Users.profile_picture_url AS commenter_profile_picture,
+    (SELECT username FROM Users WHERE Users.user_id = (SELECT user_id FROM Posts WHERE Posts.post_id = Comments.post_id)) AS post_owner_username,
+    (SELECT COUNT(*) FROM CommentLikes WHERE CommentLikes.comment_id = Comments.comment_id) AS likes_count
+  FROM Comments 
+  JOIN Users ON Comments.user_id = Users.user_id
+  WHERE post_id = ? AND parent_comment_id IS NOT NULL
+`;
 
     connection.query(mainCommentsQuery, [postId], (error, mainComments) => {
       if (error) {
