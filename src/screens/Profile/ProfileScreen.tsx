@@ -13,6 +13,7 @@ import EditProfileButton from '../../components/EditProfileButton';
 import ProfileTabNavigator from '../../components/ProfileTabNavigator';
 import tw from 'tailwind-react-native-classnames';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -37,8 +38,10 @@ const ProfileScreen = () => {
   const fetchData = useCallback(async () => {
     setRefreshing(true);
     try {
-      const userId = 1;
-      const response = await fetch(`http://10.0.2.2:3001/users/${userId}`);
+      const storedUserId = await AsyncStorage.getItem('user_id');
+      const response = await fetch(
+        `http://10.0.2.2:3001/users/${storedUserId}`,
+      );
       const data = await response.json();
       console.log(data);
       setUserData(data);

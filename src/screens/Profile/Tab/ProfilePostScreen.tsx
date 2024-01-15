@@ -1,20 +1,9 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  FlatList,
-  TouchableOpacity,
-  RefreshControl,
-} from 'react-native';
+import {View, FlatList, RefreshControl} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
-import Icon from 'react-native-vector-icons/FontAwesome';
-
 import PlusButton from '../../../components/PlusButton';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import RNRestart from 'react-native-restart';
 import FeedItem from '../../../components/FeedItem';
 
 const ProfilePostScreen = () => {
@@ -29,7 +18,7 @@ const ProfilePostScreen = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const userId = 1;
+      const userId = await AsyncStorage.getItem('user_id');
       const response = await fetch(
         `http://10.0.2.2:3001/users/${userId}/posts`,
       );

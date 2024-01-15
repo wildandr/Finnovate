@@ -1,20 +1,10 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  FlatList,
-  TouchableOpacity,
-  RefreshControl,
-} from 'react-native';
+import {View, FlatList, RefreshControl} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import FeedItem from '../../../components/FeedItem';
 import PlusButton from '../../../components/PlusButton';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import RNRestart from 'react-native-restart';
 
 const ProfileAnalysisScreen = () => {
   const navigation = useNavigation();
@@ -28,9 +18,9 @@ const ProfileAnalysisScreen = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const userId = 1;
+      const storeUserId = await AsyncStorage.getItem('user_id');
       const response = await fetch(
-        `http://10.0.2.2:3001/users/${userId}/posts-with-analysis`,
+        `http://10.0.2.2:3001/users/${storeUserId}/posts-with-analysis`,
       );
       const data = await response.json();
       const sortedData = data.sort(

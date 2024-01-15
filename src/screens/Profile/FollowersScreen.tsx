@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, FlatList} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native'; // Import the useNavigation hook
+import {useNavigation} from '@react-navigation/native';
 import tw from 'tailwind-react-native-classnames';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ItemProps {
   name: string;
@@ -18,6 +19,8 @@ const Item = ({
   refreshFollowers,
 }: ItemProps & {refreshFollowers: () => void}) => {
   const removeFollower = async () => {
+    const storedUserId = await AsyncStorage.getItem('user_id');
+
     try {
       const response = await fetch('http://10.0.2.2:3001/follow/delete', {
         method: 'DELETE',
@@ -26,7 +29,7 @@ const Item = ({
         },
         body: JSON.stringify({
           userId: followingId,
-          followingId: 1, // Ganti setelah simpan async storage
+          followingId: storedUserId,
         }),
       });
 
@@ -64,10 +67,10 @@ const FollowersScreen = () => {
   const navigation = useNavigation();
 
   const fetchData = async () => {
-    const userId = 1;
+    const storeUserId = await AsyncStorage.getItem('user_id');
     try {
       const response = await fetch(
-        `http://10.0.2.2:3001/users/${userId}/followers`,
+        `http://10.0.2.2:3001/users/${storeUserId}/followers`,
       );
       const data = await response.json();
       setFollowers(data);

@@ -32,7 +32,7 @@ const LoginScreen: React.FC = () => {
 
       let data;
       try {
-        data = await response.text();
+        data = await response.json();
       } catch (error) {
         console.error('Error:', error);
       }
@@ -40,6 +40,13 @@ const LoginScreen: React.FC = () => {
       console.log('Response:', data);
 
       await AsyncStorage.setItem('isLoggedIn', 'true');
+      await AsyncStorage.setItem('user_id', data.user_id.toString());
+
+      const storedUserId = await AsyncStorage.getItem('user_id');
+      const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
+
+      console.log('Is Logged In:', isLoggedIn);
+      console.log('Stored User ID:', storedUserId);
 
       navigation.navigate('Home');
     } catch (error) {

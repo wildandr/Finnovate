@@ -207,29 +207,17 @@ const BottomTabNavigator = () => {
 
 export default function Navigation() {
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoggedin, setIsLoggedin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // command untuk skip login
     const checkLoginStatus = async () => {
-      // const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
-      // setIsLoggedin(isLoggedIn === 'true');
-      // setIsLoading(false);
-      const isLoggedIn = true;
-
-      setIsLoggedin(isLoggedIn);
+      const value = await AsyncStorage.getItem('isLoggedIn');
+      setIsLoggedIn(value === 'true');
       setIsLoading(false);
     };
 
     checkLoginStatus();
   }, []);
-
-  const logout = async () => {
-    // command untuk skip login
-    await AsyncStorage.removeItem('isLoggedIn');
-
-    setIsLoggedin(false);
-  };
 
   if (isLoading) {
     return null;
@@ -237,11 +225,7 @@ export default function Navigation() {
 
   return (
     <NavigationContainer>
-      {isLoggedin ? (
-        <BottomTabNavigator logout={logout} />
-      ) : (
-        <RootStackScreen />
-      )}
+      {isLoggedIn ? <BottomTabNavigator /> : <RootStackScreen />}
     </NavigationContainer>
   );
 }
