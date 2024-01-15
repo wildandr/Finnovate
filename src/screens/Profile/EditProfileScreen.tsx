@@ -20,7 +20,7 @@ const EditProfileScreen = () => {
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
   const [description, setDescription] = useState('');
-
+  const [userData, setUserData] = useState(null);
   const [isChanged, setIsChanged] = useState(false);
 
   useEffect(() => {
@@ -32,6 +32,7 @@ const EditProfileScreen = () => {
           setUsername(data.username);
           setFullName(data.full_name);
           setDescription(data.description);
+          setUserData(data);
         })
         .catch(error => console.error(error));
     };
@@ -102,14 +103,34 @@ const EditProfileScreen = () => {
       <ScrollView style={styles.container}>
         <View style={{position: 'relative'}}>
           <TouchableOpacity>
-            <Image
-              style={styles.bannerImage}
-              source={require('../../assets/bgProfile.png')}
-            />
+            <View
+              style={[
+                styles.bannerImage,
+                {
+                  backgroundColor: userData?.banner_picture_url
+                    ? 'transparent'
+                    : 'grey',
+                },
+              ]}>
+              {userData?.banner_picture_url && (
+                <Image
+                  style={StyleSheet.absoluteFill}
+                  source={{uri: userData.banner_picture_url}}
+                />
+              )}
+            </View>
           </TouchableOpacity>
           <TouchableOpacity>
             <Image
-              source={require('../../assets/avatar2.png')}
+              source={
+                userData?.profile_picture_url
+                  ? {uri: userData.profile_picture_url}
+                  : {
+                      uri: `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
+                        userData?.full_name || '',
+                      )}&size=250`,
+                    }
+              }
               style={{
                 width: 90,
                 height: 90,

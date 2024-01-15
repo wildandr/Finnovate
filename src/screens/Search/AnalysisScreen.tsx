@@ -16,19 +16,24 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
 
-const AnalysisScreen = () => {
+const AnalysisScreen = ({route}) => {
   const navigation = useNavigation();
   const [feedData, setFeedData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoggedin, setIsLoggedin] = useState(false);
+  const searchText = route.params.searchText;
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:3001/posts');
+      const response = await fetch(
+        `http://10.0.2.2:3001/search-analysis?searchTerm=${encodeURIComponent(
+          searchText,
+        )}`,
+      );
       const data = await response.json();
       const sortedData = data.sort(
         (a: any, b: any) =>
@@ -40,7 +45,7 @@ const AnalysisScreen = () => {
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  };
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);

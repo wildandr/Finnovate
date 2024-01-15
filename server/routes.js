@@ -563,6 +563,7 @@ app.get('/users/:userId', function (req, res) {
         Users.username,
         Users.full_name,
         Users.profile_picture_url,
+        Users.banner_picture_url,
         Users.description,
         (SELECT COUNT(*) FROM Followings WHERE Followings.following_id = Users.user_id) AS followers_count,
         (SELECT COUNT(*) FROM Posts WHERE Posts.user_id = Users.user_id) AS posts_count
@@ -601,6 +602,8 @@ app.get('/users/:userId/posts', function (req, res) {
         Posts.post_id,
         Posts.user_id,
         Users.username, 
+        Users.profile_picture_url,
+        Users.full_name,
         Posts.caption,
         Posts.post_url,
         Posts.date_created,
@@ -609,7 +612,7 @@ app.get('/users/:userId/posts', function (req, res) {
         Posts.analysis_id,
         PostCards.analysis_id,
         PostCards.symbol,
-        PostCards.full_name,
+        PostCards.equity_name,
         PostCards.target_price,
         PostCards.initial_price,
         PostCards.upside_percentage,
@@ -639,7 +642,7 @@ app.get('/users/:userId/posts', function (req, res) {
           const {
             analysis_id,
             symbol,
-            full_name,
+            equity_name,
             target_price,
             initial_price,
             upside_percentage,
@@ -655,7 +658,7 @@ app.get('/users/:userId/posts', function (req, res) {
               ? {
                   analysis_id,
                   symbol,
-                  full_name,
+                  equity_name,
                   target_price,
                   initial_price,
                   upside_percentage,
@@ -691,6 +694,8 @@ app.get('/users/:userId/posts-with-analysis', function (req, res) {
     Posts.post_id,
     Posts.user_id,
     Users.username, 
+    Users.full_name,
+    Users.profile_picture_url,
     Posts.caption,
     Posts.post_url,
     Posts.date_created,
@@ -699,7 +704,7 @@ app.get('/users/:userId/posts-with-analysis', function (req, res) {
     Posts.analysis_id,
     PostCards.analysis_id,
     PostCards.symbol,
-    PostCards.full_name,
+    PostCards.equity_name,
     PostCards.target_price,
     PostCards.initial_price,
     PostCards.upside_percentage,
@@ -730,7 +735,7 @@ app.get('/users/:userId/posts-with-analysis', function (req, res) {
           const {
             analysis_id,
             symbol,
-            full_name,
+            equity_name,
             target_price,
             initial_price,
             upside_percentage,
@@ -746,7 +751,7 @@ app.get('/users/:userId/posts-with-analysis', function (req, res) {
               ? {
                   analysis_id,
                   symbol,
-                  full_name,
+                  equity_name,
                   target_price,
                   initial_price,
                   upside_percentage,
@@ -762,6 +767,20 @@ app.get('/users/:userId/posts-with-analysis', function (req, res) {
         res.status(200).json(transformedResults);
       }
     });
+  });
+});
+
+// Get route for all followings
+app.get('/followings', function (req, res) {
+  const query = 'SELECT * FROM Followings';
+
+  connection.query(query, (error, results) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send('An error occurred while fetching followings');
+    } else {
+      res.status(200).json(results);
+    }
   });
 });
 
@@ -875,7 +894,7 @@ app.delete('/follow/delete', function (req, res) {
 app.post('/postcards', (req, res) => {
   let {
     symbol,
-    full_name,
+    equity_name,
     target_price,
     initial_price,
     upside_percentage,
@@ -890,7 +909,7 @@ app.post('/postcards', (req, res) => {
   const insertQuery = `
     INSERT INTO PostCards (
       symbol,
-      full_name,
+      equity_name,
       target_price,
       initial_price,
       upside_percentage,
@@ -905,7 +924,7 @@ app.post('/postcards', (req, res) => {
     insertQuery,
     [
       symbol,
-      full_name,
+      equity_name,
       target_price,
       initial_price,
       upside_percentage,
@@ -989,7 +1008,7 @@ app.get('/followedPosts/:user_id', function (req, res) {
     }
 
     const query = `
-      SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+      SELECT Posts.*, Users.username, Users.full_name, Users.profile_picture_url, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
       FROM Posts
       LEFT JOIN Followings ON Posts.user_id = Followings.following_id
       LEFT JOIN Likes ON Posts.post_id = Likes.post_id
@@ -1096,14 +1115,14 @@ app.get('/search-popular', function (req, res) {
 
     const searchTerm = req.query.searchTerm || '';
     let query = `
-  SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+  SELECT Posts.*, Users.username, Users.full_name, Users.profile_picture_url, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
   FROM Posts
   LEFT JOIN Likes ON Posts.post_id = Likes.post_id
   LEFT JOIN Comments ON Posts.post_id = Comments.post_id
   LEFT JOIN Users ON Posts.user_id = Users.user_id
   LEFT JOIN PostCards ON Posts.analysis_id = PostCards.analysis_id
   WHERE Users.username LIKE '%${searchTerm}%' OR Users.full_name LIKE '%${searchTerm}%' OR PostCards.prediction LIKE '%${searchTerm}%' OR Posts.caption LIKE '%${searchTerm}%'
-  OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.full_name LIKE '%${searchTerm}%'
+  OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.equity_name LIKE '%${searchTerm}%'
 `;
 
     query += `
@@ -1208,14 +1227,14 @@ app.get('/search-latest', function (req, res) {
 
     const searchTerm = req.query.searchTerm || '';
     let query = `
-  SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+  SELECT Posts.*, Users.username, Users.full_name, Users.profile_picture_url, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
   FROM Posts
   LEFT JOIN Likes ON Posts.post_id = Likes.post_id
   LEFT JOIN Comments ON Posts.post_id = Comments.post_id
   LEFT JOIN Users ON Posts.user_id = Users.user_id
   LEFT JOIN PostCards ON Posts.analysis_id = PostCards.analysis_id
   WHERE Users.username LIKE '%${searchTerm}%' OR Users.full_name LIKE '%${searchTerm}%' OR PostCards.prediction LIKE '%${searchTerm}%' OR Posts.caption LIKE '%${searchTerm}%'
-  OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.full_name LIKE '%${searchTerm}%'
+  OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.equity_name LIKE '%${searchTerm}%'
 `;
 
     query += `
@@ -1352,14 +1371,14 @@ app.get('/search-relevant', function (req, res) {
 
     const searchTerm = req.query.searchTerm || '';
     let query = `
-      SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments,
+      SELECT Posts.*, Users.username, Users.full_name, Users.profile_picture_url, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments,
       (
         (CASE WHEN Users.username LIKE '%${searchTerm}%' THEN 1 ELSE 0 END) +
         (CASE WHEN Users.full_name LIKE '%${searchTerm}%' THEN 1 ELSE 0 END) +
         (CASE WHEN PostCards.prediction LIKE '%${searchTerm}%' THEN 1 ELSE 0 END) +
         (CASE WHEN Posts.caption LIKE '%${searchTerm}%' THEN 1 ELSE 0 END) +
         (CASE WHEN PostCards.symbol LIKE '%${searchTerm}%' THEN 1 ELSE 0 END) +
-        (CASE WHEN PostCards.full_name LIKE '%${searchTerm}%' THEN 1 ELSE 0 END)
+        (CASE WHEN PostCards.equity_name LIKE '%${searchTerm}%' THEN 1 ELSE 0 END)
       ) AS relevance
       FROM Posts
       LEFT JOIN Likes ON Posts.post_id = Likes.post_id
@@ -1367,7 +1386,7 @@ app.get('/search-relevant', function (req, res) {
       LEFT JOIN Users ON Posts.user_id = Users.user_id
       LEFT JOIN PostCards ON Posts.analysis_id = PostCards.analysis_id
       WHERE Users.username LIKE '%${searchTerm}%' OR Users.full_name LIKE '%${searchTerm}%' OR PostCards.prediction LIKE '%${searchTerm}%' OR Posts.caption LIKE '%${searchTerm}%'
-      OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.full_name LIKE '%${searchTerm}%'
+      OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.equity_name LIKE '%${searchTerm}%'
     `;
 
     query += `
@@ -1472,14 +1491,14 @@ app.get('/search-analysis', function (req, res) {
 
     const searchTerm = req.query.searchTerm || '';
     let query = `
-  SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+  SELECT Posts.*, Users.username, Users.full_name,Users.profile_picture_url, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
   FROM Posts
   LEFT JOIN Likes ON Posts.post_id = Likes.post_id
   LEFT JOIN Comments ON Posts.post_id = Comments.post_id
   LEFT JOIN Users ON Posts.user_id = Users.user_id
   LEFT JOIN PostCards ON Posts.analysis_id = PostCards.analysis_id
   WHERE (Users.username LIKE '%${searchTerm}%' OR Users.full_name LIKE '%${searchTerm}%' OR PostCards.prediction LIKE '%${searchTerm}%' OR Posts.caption LIKE '%${searchTerm}%'
-  OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.full_name LIKE '%${searchTerm}%') AND Posts.analysis_id IS NOT NULL
+  OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.equity_name LIKE '%${searchTerm}%') AND Posts.analysis_id IS NOT NULL
 `;
 
     query += `

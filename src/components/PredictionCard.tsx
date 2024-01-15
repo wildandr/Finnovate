@@ -24,7 +24,7 @@ const PredictionCard = ({analysis}) => {
           {analysis.symbol}
         </Text>
         <Text style={[tw`text-white text-center ml-2`, {fontSize: 10}]}>
-          {analysis.full_name}
+          {analysis.equity_name}
         </Text>
       </View>
       <View style={tw`flex-row items-center mt-2`}>

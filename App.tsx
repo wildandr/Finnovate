@@ -1,10 +1,15 @@
-// App.tsx
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import {StatusBar} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
 import Navigation from './navigation';
 
 const App = () => {
-  return <Navigation />;
+  return (
+    <>
+      <StatusBar backgroundColor="#00112B" />
+      <Navigation />
+    </>
+  );
 };
 
 export default App;

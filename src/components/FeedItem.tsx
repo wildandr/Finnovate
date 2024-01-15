@@ -7,7 +7,6 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import moment from 'moment';
 import PredictionCard from './PredictionCard';
 import {useNavigation} from '@react-navigation/native';
-import supabase from '../../server/supabaseClient';
 
 function formatTimestamp(timestamp) {
   const time = moment(timestamp);
@@ -68,7 +67,25 @@ const FeedItem = ({item}: {item: any}) => {
         <View
           style={[tw`p-4 rounded-md ml-4 mt-2`, {backgroundColor: '#002351'}]}>
           <View style={tw`flex-row`}>
-            <Icon name="user-circle" size={36} color="white" style={tw`mr-2`} />
+            <Image
+              source={
+                item?.profile_picture_url
+                  ? {uri: item.profile_picture_url}
+                  : {
+                      uri: `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
+                        item.full_name || '',
+                      )}&size=36`,
+                    }
+              }
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 18,
+                marginRight: 8,
+                borderWidth: 1,
+                borderColor: 'black',
+              }}
+            />
             <View style={tw`ml-2`}>
               <Text style={tw`font-bold text-white`}>{item.username}</Text>
               <Text style={tw`text-white`}>

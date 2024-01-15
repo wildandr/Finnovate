@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   TextInput,
@@ -18,13 +18,13 @@ import PublishImageCard from '../../components/PublishImageCard';
 import ImagePicker from 'react-native-image-crop-picker';
 import supabase from '../../../server/supabaseClient';
 import {decode} from 'base64-arraybuffer';
-import { ScrollView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PublishScreen = () => {
+  const navigation = useNavigation();
   const [content, setContent] = useState('');
   const [showTradingPlanCard, setShowTradingPlanCard] = useState(false);
   const [tradingPlanCardValues, setTradingPlanCardValues] = useState({});
-  const navigation = useNavigation();
 
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
@@ -113,6 +113,7 @@ const PublishScreen = () => {
   };
 
   const publishPost = async analysis_id => {
+    const userId = await AsyncStorage.getItem('user_id');
     try {
       const response = await fetch('http://10.0.2.2:3001/new-post', {
         method: 'POST',
@@ -120,7 +121,7 @@ const PublishScreen = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: 1,
+          user_id: userId,
           caption: content,
           post_url: null,
           image_path: imageUrl,
