@@ -7,6 +7,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import moment from 'moment';
 import PredictionCard from './PredictionCard';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function formatTimestamp(timestamp) {
   const time = moment(timestamp);
@@ -34,23 +35,25 @@ const FeedItem = ({item}: {item: any}) => {
 
   useEffect(() => {
     const fetchLikes = async () => {
+      const userId = await AsyncStorage.getItem('user_id');
       const response = await fetch('http://10.0.2.2:3001/likes');
       const likes = await response.json();
       const userLike = likes.find(
-        (like: any) => like.user_id === 1 && like.post_id === item.post_id,
+        (like: any) => like.user_id === userId && like.post_id === item.post_id,
       );
       setIsLiked(!!userLike);
     };
 
     fetchLikes();
-  }, [item]);
+  }, []);
 
   const handleLike = async () => {
+    const userId = await AsyncStorage.getItem('user_id');
     const url = isLiked
       ? 'http://10.0.2.2:3001/likes/delete'
       : 'http://10.0.2.2:3001/likes/create';
     const method = isLiked ? 'DELETE' : 'POST';
-    const body = JSON.stringify({user_id: 1, post_id: item.post_id});
+    const body = JSON.stringify({user_id: userId, post_id: item.post_id});
 
     await fetch(url, {
       method,
