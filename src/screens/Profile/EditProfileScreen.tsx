@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+  ScrollView,
   View,
   Text,
   Image,
@@ -90,7 +91,7 @@ const EditProfileScreen = () => {
           />
         </TouchableOpacity>
       </View>
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={{position: 'relative'}}>
           <TouchableOpacity>
             <Image
@@ -145,7 +146,7 @@ const EditProfileScreen = () => {
             <Text style={tw`text-red-500 mt-2`}>Log Out</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };

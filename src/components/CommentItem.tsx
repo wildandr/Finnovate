@@ -8,22 +8,25 @@ import tw from 'tailwind-react-native-classnames';
 
 const CommentItem = () => {
   return (
-    <View style={[tw`flex-row pt-3 ml-4 mt-4`, {backgroundColor: '#002351'}]}>
+    <View style={[tw`flex-row pt-3 ml-4 mt-2`, {backgroundColor: '#002351'}]}>
       <View style={tw`flex-1 ml-3`}>
         <View style={tw`flex-row items-center`}>
-          <Icon name="user-circle" size={36} color="white" style={tw`mr-2`} />
+          <Icon name="user-circle" size={36} color="white" style={tw`mr-1`} />
           <View>
+          <View style={tw`flex-row items-center`}>
             <Text style={tw`font-bold text-white ml-2`}>User Name</Text>
-            <View style={tw`flex-row`}>
-              <Text style={tw`text-white ml-2`}>Replying to </Text>
-              <Text style={tw`text-yellow-400`}>@AnotherUser</Text>
-            </View>
+            <Entypo name='dot-single' size={16} color='gray' style={tw`mx-1`} />
+            <Text style={tw`text-gray-500`}>21h</Text>
+          </View>
+          <View style={tw`flex-row`}>
+            <Text style={tw`text-white ml-2`}>Replying to </Text>
+            <Text style={tw`text-yellow-400`}>@AnotherUser</Text>
           </View>
         </View>
-        <Text style={tw`text-white mt-4`}>This is a comment</Text>
+        </View>
+        <Text style={tw`text-white mt-4 ml-12`}>This is a comment</Text>
         <View style={tw`flex-row justify-between items-center mt-2`}>
-          <Text style={tw`text-gray-500`}>27 Des 23, 20:12</Text>
-          <View style={tw`flex-row`}>
+          <View style={tw`flex-row ml-12`}>
             <View style={tw`flex-row items-center mr-4`}>
               <TouchableOpacity>
                 <Icon name="heart-o" size={16} color="gray" />

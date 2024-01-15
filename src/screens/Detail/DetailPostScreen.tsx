@@ -25,7 +25,6 @@ const DetailPostScreen = () => {
         <View style={{width: 24}} />
       </View>
       <FeedDetailItem item={item} />
-      <View style={{height: 2, backgroundColor: '#001736'}} />
       <CommentItem />
     </View>
   );

@@ -4,6 +4,7 @@ import tw from 'tailwind-react-native-classnames';
 import DatePicker from 'react-native-date-picker';
 import DropdownPrediction from './DropdownPrediction';
 import {MaterialIcons} from 'react-native-vector-icons';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const TradingPlanCard = ({onValuesChange}) => {
   const [equitySymbol, setEquitySymbol] = useState('');
@@ -34,7 +35,7 @@ const TradingPlanCard = ({onValuesChange}) => {
   };
 
   return (
-    <View>
+    <ScrollView>
       <DropdownPrediction onValueChange={setPrediction} />
       <View style={[tw`p-4`, {backgroundColor: '#2A476E'}]}>
         <TextInput
@@ -93,7 +94,7 @@ const TradingPlanCard = ({onValuesChange}) => {
           }}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
