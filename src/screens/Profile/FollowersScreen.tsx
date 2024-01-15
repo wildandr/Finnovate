@@ -7,45 +7,93 @@ import tw from 'tailwind-react-native-classnames';
 interface ItemProps {
   name: string;
   username: string;
+  userId: number;
+  followingId: number;
 }
 
-const Item = ({name, username}: ItemProps) => (
-  <View style={tw`flex-row items-center mt-5`}>
-    <Icon name="person-circle" size={50} color="white" />
-    <View style={tw`ml-2`}>
-      <Text style={tw`text-white text-lg font-bold`}>{name}</Text>
-      <Text style={tw`text-yellow-400`}>@{username}</Text>
+const Item = ({
+  name,
+  username,
+  followingId,
+  refreshFollowers,
+}: ItemProps & {refreshFollowers: () => void}) => {
+  const removeFollower = async () => {
+    try {
+      console.log(`Deleting follower with ID: ${followingId}`);
+
+      const response = await fetch('http://10.0.2.2:3001/follow/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: followingId,
+          followingId: 1, // Ganti
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error deleting follower');
+      } else {
+        const responseBody = await response.json();
+        console.log(responseBody);
+      }
+
+      refreshFollowers();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <View style={tw`flex-row items-center mt-5`}>
+      <Icon name="person-circle" size={50} color="white" />
+      <View style={tw`ml-2`}>
+        <Text style={tw`text-white text-lg font-bold`}>{name}</Text>
+        <Text style={tw`text-yellow-400`}>@{username}</Text>
+      </View>
+      <TouchableOpacity
+        style={tw`h-10 ml-auto border border-gray-500 p-2 rounded-lg`}
+        onPress={removeFollower}>
+        <Text style={tw`text-white mx-2`}>Remove</Text>
+      </TouchableOpacity>
     </View>
-    <TouchableOpacity
-      style={tw`h-10 ml-auto border border-gray-500 p-2 rounded-lg`}>
-      <Text style={tw`text-white mx-2`}>Remove</Text>
-    </TouchableOpacity>
-  </View>
-);
+  );
+};
 
 const FollowersScreen = () => {
   const [followers, setFollowers] = useState([]);
   const navigation = useNavigation();
 
-  useEffect(() => {
+  const fetchData = async () => {
     const userId = 1;
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          `http://10.0.2.2:3001/users/${userId}/followers`,
-        );
-        const data = await response.json();
-        setFollowers(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+    try {
+      const response = await fetch(
+        `http://10.0.2.2:3001/users/${userId}/followers`,
+      );
+      const data = await response.json();
+      setFollowers(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, []);
 
+  const refreshFollowers = () => {
+    fetchData();
+  };
+
   const renderItem = ({item}: {item: ItemProps}) => (
-    <Item name={item.full_name} username={item.username} />
+    <Item
+      name={item.full_name}
+      username={item.username}
+      userId={1}
+      followingId={item.user_id}
+      refreshFollowers={refreshFollowers}
+    />
   );
 
   return (
@@ -59,7 +107,7 @@ const FollowersScreen = () => {
       <FlatList
         data={followers}
         renderItem={renderItem}
-        keyExtractor={item => item.user_id.toString()}
+        keyExtractor={item => item.id?.toString()}
       />
     </View>
   );

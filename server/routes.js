@@ -846,6 +846,11 @@ app.delete('/follow/delete', function (req, res) {
 
     const {userId, followingId} = req.body;
 
+    if (!userId || !followingId) {
+      res.status(400).send('userId and followingId are required');
+      return;
+    }
+
     const query = `
       DELETE FROM Followings 
       WHERE user_id = ? AND following_id = ?
@@ -858,7 +863,10 @@ app.delete('/follow/delete', function (req, res) {
         console.log(error);
         res.status(500).send('An error occurred while deleting a follow');
       } else {
-        res.status(200).send('Follow deleted successfully');
+        res
+          .status(200)
+          .send({message: 'Follow deleted successfully', userId, followingId});
+        console.log(results);
       }
     });
   });
@@ -965,6 +973,113 @@ app.put('/users/:userId/update', function (req, res) {
       } else {
         res.status(200).send('User info updated successfully');
       }
+    });
+  });
+});
+
+app.get('/followedPosts/:user_id', function (req, res) {
+  const {user_id} = req.params;
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const query = `
+      SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+      FROM Posts
+      LEFT JOIN Followings ON Posts.user_id = Followings.following_id
+      LEFT JOIN Likes ON Posts.post_id = Likes.post_id
+      LEFT JOIN Comments ON Posts.post_id = Comments.post_id
+      LEFT JOIN Users ON Posts.user_id = Users.user_id
+      WHERE Followings.user_id = ? OR Posts.user_id = ?
+      GROUP BY Posts.post_id
+    `;
+
+    connection.query(query, [user_id, user_id], (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching posts');
+        connection.release();
+        return;
+      }
+
+      let completedQueries = 0;
+      results.forEach((post, index) => {
+        const commentsQuery = `
+          SELECT comment_id, post_id, user_id, content, date_created, parent_comment_id
+          FROM Comments
+          WHERE post_id = ?
+          ORDER BY parent_comment_id ASC
+        `;
+
+        connection.query(commentsQuery, [post.post_id], (error, comments) => {
+          if (error) {
+            console.log(error);
+            res.status(500).send('An error occurred while fetching comments');
+            connection.release();
+            return;
+          }
+
+          const commentsWithReplies = comments.reduce((acc, comment) => {
+            if (comment.parent_comment_id) {
+              const parentComment = acc.find(
+                c => c.comment_id === comment.parent_comment_id,
+              );
+              if (parentComment) {
+                parentComment.replies = parentComment.replies || [];
+                parentComment.replies.push(comment);
+              }
+            } else {
+              acc.push(comment);
+            }
+            return acc;
+          }, []);
+
+          results[index].commentsArray = commentsWithReplies;
+
+          if (post.analysis_id) {
+            const analysisQuery = `
+              SELECT *
+              FROM PostCards
+              WHERE analysis_id = ?
+            `;
+
+            connection.query(
+              analysisQuery,
+              [post.analysis_id],
+              (error, analysis) => {
+                if (error) {
+                  console.log(error);
+                  res
+                    .status(500)
+                    .send('An error occurred while fetching analysis');
+                  connection.release();
+                  return;
+                }
+
+                results[index].analysis = analysis[0];
+                completedQueries++;
+
+                if (completedQueries === results.length) {
+                  res.status(200).json(results);
+                  connection.release();
+                }
+              },
+            );
+          } else {
+            completedQueries++;
+
+            if (completedQueries === results.length) {
+              res.status(200).json(results);
+              connection.release();
+            }
+          }
+        });
+      });
     });
   });
 });

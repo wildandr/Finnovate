@@ -29,7 +29,10 @@ const HomeScreen = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await fetch('http://10.0.2.2:3001/posts');
+      const userId = 1;
+      const response = await fetch(
+        `http://10.0.2.2:3001/followedPosts/${userId}`,
+      );
       const data = await response.json();
       const sortedData = data.sort(
         (a: any, b: any) =>
