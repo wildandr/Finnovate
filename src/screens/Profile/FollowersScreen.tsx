@@ -19,8 +19,6 @@ const Item = ({
 }: ItemProps & {refreshFollowers: () => void}) => {
   const removeFollower = async () => {
     try {
-      console.log(`Deleting follower with ID: ${followingId}`);
-
       const response = await fetch('http://10.0.2.2:3001/follow/delete', {
         method: 'DELETE',
         headers: {
@@ -28,7 +26,7 @@ const Item = ({
         },
         body: JSON.stringify({
           userId: followingId,
-          followingId: 1, // Ganti
+          followingId: 1, // Ganti setelah simpan async storage
         }),
       });
 
