@@ -48,11 +48,10 @@ const FeedDetailItem = ({item}: {item: any}) => {
   };
 
   return (
-    <TouchableOpacity onPress={() => navigation.navigate('DetailPost', {item})}>
       <View>
         <View
-          style={[tw`p-4 rounded-md ml-4 mt-2`, {backgroundColor: '#002351'}]}>
-          <View style={tw`flex-row`}>
+          style={[tw`rounded-md mt-2`, {backgroundColor: '#002351'}]}>
+          <View style={tw`flex-row p-4`}>
             <Icon name="user-circle" size={36} color="white" style={tw`mr-2`} />
             <View style={tw`ml-2`}>
               <Text style={tw`font-bold text-white`}>{item.full_name}</Text>
@@ -65,7 +64,7 @@ const FeedDetailItem = ({item}: {item: any}) => {
               style={tw`ml-auto`}
             />
           </View>
-          <Text style={tw`text-white my-3 `}>{item.caption}</Text>
+          <Text style={tw`text-white ml-4 mb-4`}>{item.caption}</Text>
           {item.image_path && (
             <View
               style={{
@@ -73,6 +72,7 @@ const FeedDetailItem = ({item}: {item: any}) => {
                 height: 200,
                 justifyContent: 'center',
                 alignItems: 'center',
+                padding: 10, // Add padding here
               }}>
               <Image
                 source={{uri: item.image_path}}
@@ -81,13 +81,18 @@ const FeedDetailItem = ({item}: {item: any}) => {
               />
             </View>
           )}
-          {item.analysis && <PredictionCard analysis={item.analysis} />}
+          {item.analysis && (
+          <View style={tw`p-4`}>
+            <PredictionCard analysis={item.analysis} />
+          </View>
+        )}
 
-          <View style={tw`flex-row justify-between items-center mb-3`}>
+          <View style={tw`flex-row justify-between items-center mb-3 ml-4`}>
             <Text style={tw`text-gray-400`}>{formatTimestamp(item.date)}</Text>
           </View>
+          <View style={{borderTopWidth: 1, borderColor: '#6B7280', marginVertical: 12}} />
           <View style={tw`flex-row`}>
-            <View style={tw`flex-row items-center mr-4`}>
+            <View style={tw`flex-row items-center mr-4 ml-4`}>
               <TouchableOpacity onPress={handleLike}>
                 <Icon
                   name={isLiked ? 'heart' : 'heart-o'}
@@ -98,18 +103,14 @@ const FeedDetailItem = ({item}: {item: any}) => {
               <Text style={tw`text-white ml-2`}>{likes}</Text>
             </View>
             <View style={tw`flex-row items-center`}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('CommentPost')}>
                 <Fontisto name="comment" size={16} color="white" />
-              </TouchableOpacity>
               <Text style={tw`text-white ml-2`}>{item.comments}</Text>
             </View>
           </View>
-        </View>
-        <View style={[tw`mt-0`, {height: 1, backgroundColor: '#001736'}]} />
-      </View>
-    </TouchableOpacity>
-  );
-};
+          <View style={{borderBottomWidth: 1, borderColor: '#6B7280', marginVertical: 12}} />
+                  </View>
+                </View>
+            );
+          };
 
 export default FeedDetailItem;

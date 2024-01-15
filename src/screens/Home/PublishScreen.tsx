@@ -18,6 +18,7 @@ import PublishImageCard from '../../components/PublishImageCard';
 import ImagePicker from 'react-native-image-crop-picker';
 import supabase from '../../../server/supabaseClient';
 import {decode} from 'base64-arraybuffer';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const PublishScreen = () => {
   const [content, setContent] = useState('');

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Image, Text, TouchableOpacity, Alert} from 'react-native'; // Import TouchableOpacity
+import {ScrollView, View, Image, Text, TouchableOpacity, Alert} from 'react-native'; // Import TouchableOpacity
 import {Checkbox} from 'react-native-paper';
 import tw from 'tailwind-react-native-classnames';
 import SignUpButton from '../../components/Register_SignUpButton';
@@ -54,8 +54,8 @@ const RegisterScreen: React.FC = () => {
   };
 
   return (
-    <View
-      style={[
+    <ScrollView
+      contentContainerStyle={[
         tw`p-4 flex-1 justify-center items-center`,
         {backgroundColor: '#002351'},
       ]}>
@@ -114,7 +114,7 @@ const RegisterScreen: React.FC = () => {
           <Text style={[{fontWeight: 'bold', color: '#FFBC00'}]}>Sign in</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
