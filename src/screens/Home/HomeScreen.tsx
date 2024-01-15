@@ -12,24 +12,27 @@ import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FeedItem from '../../components/FeedItem';
 import PlusButton from '../../components/PlusButton';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const [feedData, setFeedData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoggedin, setIsLoggedin] = useState(false);
   const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isFocused) {
+      fetchData();
+    }
+  }, [isFocused]);
 
   const fetchData = useCallback(async () => {
     try {
-      const userId = 1;
+      const userId = await AsyncStorage.getItem('user_id');
       const response = await fetch(
         `http://10.0.2.2:3001/followedPosts/${userId}`,
       );

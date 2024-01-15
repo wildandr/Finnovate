@@ -3,11 +3,12 @@ import {View, TextInput} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import tw from 'tailwind-react-native-classnames';
-import SearchTabNavigator from '../../components/SearchTabNavigator'; // Import the SearchTabNavigator
+import SearchTabNavigator from '../../components/SearchTabNavigator';
+import SearchTextContext from '../../contexts/SearchTextContext';
 
 const SearchScreen = ({route}) => {
   const {searchText: initialSearchText} = route.params;
-  const [searchText, setSearchText] = useState(initialSearchText);
+  const [searchText, setSearchText] = useState(initialSearchText || '');
 
   const navigation = useNavigation();
 
@@ -35,7 +36,9 @@ const SearchScreen = ({route}) => {
           />
         </View>
       </View>
-      <SearchTabNavigator />
+      <SearchTextContext.Provider value={searchText}>
+        <SearchTabNavigator />
+      </SearchTextContext.Provider>
     </View>
   );
 };

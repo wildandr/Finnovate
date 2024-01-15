@@ -4,8 +4,9 @@ import {
   Text,
   Image,
   StyleSheet,
-  ScrollView,
-  RefreshControl,
+  TouchableOpacity,
+  Modal,
+  Button,
 } from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import Stat from '../../components/StatistikProfile';
@@ -14,6 +15,7 @@ import ProfileTabNavigator from '../../components/ProfileTabNavigator';
 import tw from 'tailwind-react-native-classnames';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -34,6 +36,25 @@ const ProfileScreen = () => {
 
   const [userData, setUserData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [isImageViewVisible, setIsImageViewVisible] = useState(false);
+
+  const images = [
+    {
+      url:
+        userData?.profile_picture_url ||
+        `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
+          userData?.full_name || '',
+        )}&size=90`,
+    },
+  ];
+
+  const [isBannerImageViewVisible, setBannerImageViewVisible] = useState(false);
+
+  const bannerImages = [
+    {
+      url: userData?.banner_picture_url || '',
+    },
+  ];
 
   const fetchData = useCallback(async () => {
     setRefreshing(true);
@@ -65,21 +86,67 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <View style={{position: 'relative'}}>
-        <Image
-          style={styles.bannerImage}
-          source={require('../../assets/bgProfile.png')}
-        />
-        <Image
-          source={require('../../assets/avatar2.png')}
-          style={{
-            width: 90,
-            height: 90,
-            borderRadius: 30,
-            position: 'absolute',
-            bottom: -40,
-            left: 10,
-          }}
-        />
+        <View
+          style={[
+            styles.bannerImage,
+            {
+              backgroundColor: userData?.banner_picture_url
+                ? 'transparent'
+                : 'grey',
+            },
+          ]}>
+          {userData?.banner_picture_url && (
+            <TouchableOpacity onPress={() => setBannerImageViewVisible(true)}>
+              <Image
+                style={StyleSheet.absoluteFill}
+                source={{uri: userData.banner_picture_url}}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <Modal visible={isBannerImageViewVisible} transparent={true}>
+          <ImageViewer
+            imageUrls={bannerImages}
+            onSwipeDown={() => setBannerImageViewVisible(false)}
+            enableSwipeDown
+          />
+          <Button
+            title="Close"
+            onPress={() => setBannerImageViewVisible(false)}
+          />
+        </Modal>
+        <TouchableOpacity onPress={() => setIsImageViewVisible(true)}>
+          <Image
+            source={
+              userData?.profile_picture_url
+                ? {uri: userData.profile_picture_url}
+                : {
+                    uri: `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
+                      userData?.full_name || '',
+                    )}&size=90`,
+                  }
+            }
+            style={{
+              width: 90,
+              height: 90,
+              borderRadius: 30,
+              position: 'absolute',
+              bottom: -40,
+              left: 10,
+              borderWidth: 2,
+              borderColor: 'black',
+            }}
+          />
+        </TouchableOpacity>
+        <Modal visible={isImageViewVisible} transparent={true}>
+          <ImageViewer
+            imageUrls={images}
+            onSwipeDown={() => setIsImageViewVisible(false)}
+            enableSwipeDown
+          />
+          <Button title="Close" onPress={() => setIsImageViewVisible(false)} />
+        </Modal>
       </View>
       <View style={tw`flex-row ml-52 w-60 mt-2`}>
         <Stat

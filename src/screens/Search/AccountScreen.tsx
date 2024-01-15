@@ -1,71 +1,165 @@
-import React from 'react';
-import {View, Text, TouchableOpacity, FlatList} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native'; // Import the useNavigation hook
+import React, {useEffect, useState} from 'react';
+import {View, Text, TouchableOpacity, FlatList, Image} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import tw from 'tailwind-react-native-classnames';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ItemProps {
-  name: string;
+  full_name: string;
   username: string;
+  profile_picture_url: string;
+  isFollowing: boolean;
 }
 
-const DATA = [
-  {
-    id: '1',
-    name: 'User 1',
-    username: 'user1',
-  },
-  {
-    id: '2',
-    name: 'User 2',
-    username: 'user2',
-  },
-  {
-    id: '3',
-    name: 'User 3',
-    username: 'user3',
-  },
-  {
-    id: '4',
-    name: 'User 4',
-    username: 'user4',
-  },
-  {
-    id: '5',
-    name: 'User 5',
-    username: 'user5',
-  },
-
-  // Add more followers here
-];
-
-const Item = ({name, username}: ItemProps) => (
+const Item = ({
+  name,
+  username,
+  profile_picture_url,
+  isFollowing,
+  handleFollow,
+  handleUnfollow,
+}: ItemProps) => (
   <View style={tw`flex-row items-center mt-5`}>
-    <Icon name="person-circle" size={50} color="white" />
+    <Image
+      source={
+        profile_picture_url
+          ? {uri: profile_picture_url}
+          : {
+              uri: `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
+                name || '',
+              )}&size=50`,
+            }
+      }
+      style={{
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        borderWidth: 2,
+        borderColor: 'black',
+      }}
+    />
     <View style={tw`ml-2`}>
       <Text style={tw`text-white text-lg font-bold`}>{name}</Text>
       <Text style={tw`text-yellow-400`}>@{username}</Text>
     </View>
 
     <TouchableOpacity
-      style={tw`h-10 ml-auto border border-gray-500 p-2 rounded-lg bg-white`}>
-      <Text style={tw`text-black mx-2`}>Follow</Text>
+      onPress={() => {
+        isFollowing ? handleUnfollow() : handleFollow();
+      }}
+      style={[
+        tw`h-10 ml-auto border p-2 rounded-lg`,
+        isFollowing
+          ? tw`border-white bg-transparent`
+          : tw`border-gray-500 bg-white`,
+      ]}>
+      <Text style={[tw`mx-2`, isFollowing ? tw`text-white` : tw`text-black`]}>
+        {isFollowing ? 'Remove' : 'Follow'}
+      </Text>
     </TouchableOpacity>
   </View>
 );
 
-const AccountScreen = () => {
-  const navigation = useNavigation(); // Initialize the navigation object
-  const renderItem = ({item}: {item: ItemProps}) => (
-    <Item name={item.name} username={item.username} />
-  );
+const AccountScreen = ({route}) => {
+  const navigation = useNavigation();
+  const [data, setData] = useState<ItemProps[]>([]);
+  const [followings, setFollowings] = useState<any[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const searchText = route.params.searchText;
+  console.log('searchTextPopular:', searchText);
+
+  useEffect(() => {
+    const getUserId = async () => {
+      const id = await AsyncStorage.getItem('user_id');
+      setUserId(id);
+    };
+
+    getUserId();
+
+    fetch('http://10.0.2.2:3001/search-users?searchTerm=' + searchText)
+      .then(response => response.json())
+      .then(json => {
+        console.log(json);
+        setData(json);
+      });
+
+    fetch('http://10.0.2.2:3001/followings')
+      .then(response => response.json())
+      .then(json => {
+        setFollowings(json);
+      });
+  }, [searchText]);
+
+  const handleFollow = async (followingId: string) => {
+    const response = await fetch('http://10.0.2.2:3001/follow', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: userId || '',
+        followingId,
+      }),
+    });
+
+    if (response.ok) {
+      // Handle successful follow
+      setFollowings([
+        ...followings,
+        {user_id: userId, following_id: followingId},
+      ]);
+    } else {
+      // Handle error
+    }
+  };
+
+  const handleUnfollow = async (followingId: string) => {
+    const response = await fetch('http://10.0.2.2:3001/follow/delete', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: userId || '',
+        followingId,
+      }),
+    });
+
+    if (response.ok) {
+      // Handle successful unfollow
+      setFollowings(
+        followings.filter(following => following.following_id !== followingId),
+      );
+    } else {
+      // Handle error
+    }
+  };
+
+  const renderItem = ({item}: {item: ItemProps}) => {
+    const isFollowing = followings.some(
+      following =>
+        following.user_id.toString() === userId &&
+        following.following_id === item.user_id,
+    );
+
+    return (
+      <Item
+        name={item.full_name}
+        username={item.username}
+        profile_picture_url={item.profile_picture_url}
+        isFollowing={isFollowing}
+        handleFollow={() => handleFollow(item.user_id)}
+        handleUnfollow={() => handleUnfollow(item.user_id)}
+      />
+    );
+  };
 
   return (
     <View style={[tw`flex-1 p-5`, {backgroundColor: '#002351'}]}>
       <FlatList
-        data={DATA}
+        data={data}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.username}
       />
     </View>
   );

@@ -1,43 +1,31 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, FlatList} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import FeedItem from '../../components/FeedItem';
-import PlusButton from '../../components/PlusButton';
 import {useNavigation} from '@react-navigation/native';
 
-const PopularScreen = () => {
+const PopularScreen = ({route}) => {
   const navigation = useNavigation();
-  const feedData = [
-    {
-      id: '1',
-      username: 'JohnDoe',
-      timestamp: '1 jam yang lalu',
-      text: 'Ini adalah feed pertama. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-      image: require('../../assets/onboarding2.png'),
-    },
-    {
-      id: '2',
-      username: 'JaneSmith',
-      timestamp: '2 jam yang lalu',
-      text: 'Ini adalah feed kedua. Ut enim ad minim veniam.',
-      image: require('../../assets/onboarding1.png'),
-    },
-    // ... tambahkan data feed lainnya sesuai kebutuhan
-  ];
+  const searchText = route.params.searchText;
+  console.log('searchTextPopular:', searchText);
+  const [feedData, setFeedData] = useState([]);
+
+  useEffect(() => {
+    fetch(
+      `http://10.0.2.2:3001/search-popular?searchTerm=${encodeURIComponent(
+        searchText,
+      )}`,
+    )
+      .then(response => response.json())
+      .then(data => setFeedData(data))
+      .catch(error => console.error(error));
+  }, [searchText]);
 
   return (
     <View style={[tw`flex-1`, {backgroundColor: '#002351'}]}>
       <FlatList
         data={feedData}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.post_id.toString()}
         renderItem={({item}) => <FeedItem item={item} />}
         style={tw`mt-8`}
       />

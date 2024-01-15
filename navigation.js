@@ -22,6 +22,7 @@ import MarketTechnical from './src/screens/Market/MarketTechnical';
 import MarketFundamental from './src/screens/Market/MarketFundamental';
 import Course from './src/screens/Education/Course';
 import DetailCourse from './src/screens/Education/DetailCourse';
+import KeyboardSpacer from 'react-native-keyboard-spacer';
 
 import PublishScreen from './src/screens/Home/PublishScreen';
 import CourseContent from './src/screens/Education/CourseContent';
@@ -151,6 +152,7 @@ const BottomTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={{
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           backgroundColor: '#00112B',
           height: 70,
