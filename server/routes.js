@@ -1084,6 +1084,493 @@ app.get('/followedPosts/:user_id', function (req, res) {
   });
 });
 
+app.get('/search-popular', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const searchTerm = req.query.searchTerm || '';
+    let query = `
+  SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+  FROM Posts
+  LEFT JOIN Likes ON Posts.post_id = Likes.post_id
+  LEFT JOIN Comments ON Posts.post_id = Comments.post_id
+  LEFT JOIN Users ON Posts.user_id = Users.user_id
+  LEFT JOIN PostCards ON Posts.analysis_id = PostCards.analysis_id
+  WHERE Users.username LIKE '%${searchTerm}%' OR Users.full_name LIKE '%${searchTerm}%' OR PostCards.prediction LIKE '%${searchTerm}%' OR Posts.caption LIKE '%${searchTerm}%'
+  OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.full_name LIKE '%${searchTerm}%'
+`;
+
+    query += `
+  GROUP BY Posts.post_id
+  ORDER BY likes DESC, comments DESC
+`;
+
+    connection.query(query, (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching posts');
+        connection.release();
+        return;
+      }
+
+      let completedQueries = 0;
+      results.forEach((post, index) => {
+        const commentsQuery = `
+          SELECT comment_id, post_id, user_id, content, date_created, parent_comment_id
+          FROM Comments
+          WHERE post_id = ?
+          ORDER BY parent_comment_id ASC
+        `;
+
+        connection.query(commentsQuery, [post.post_id], (error, comments) => {
+          if (error) {
+            console.log(error);
+            res.status(500).send('An error occurred while fetching comments');
+            connection.release();
+            return;
+          }
+
+          const commentsWithReplies = comments.reduce((acc, comment) => {
+            if (comment.parent_comment_id) {
+              const parentComment = acc.find(
+                c => c.comment_id === comment.parent_comment_id,
+              );
+              if (parentComment) {
+                parentComment.replies = parentComment.replies || [];
+                parentComment.replies.push(comment);
+              }
+            } else {
+              acc.push(comment);
+            }
+            return acc;
+          }, []);
+
+          results[index].commentsArray = commentsWithReplies;
+
+          if (post.analysis_id) {
+            const analysisQuery = `
+              SELECT *
+              FROM PostCards
+              WHERE analysis_id = ?
+            `;
+
+            connection.query(
+              analysisQuery,
+              [post.analysis_id],
+              (error, analysis) => {
+                if (error) {
+                  console.log(error);
+                  res
+                    .status(500)
+                    .send('An error occurred while fetching analysis');
+                  connection.release();
+                  return;
+                }
+
+                results[index].analysis = analysis[0];
+                completedQueries++;
+
+                if (completedQueries === results.length) {
+                  res.status(200).json(results);
+                  connection.release();
+                }
+              },
+            );
+          } else {
+            completedQueries++;
+
+            if (completedQueries === results.length) {
+              res.status(200).json(results);
+              connection.release();
+            }
+          }
+        });
+      });
+    });
+  });
+});
+
+app.get('/search-latest', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const searchTerm = req.query.searchTerm || '';
+    let query = `
+  SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+  FROM Posts
+  LEFT JOIN Likes ON Posts.post_id = Likes.post_id
+  LEFT JOIN Comments ON Posts.post_id = Comments.post_id
+  LEFT JOIN Users ON Posts.user_id = Users.user_id
+  LEFT JOIN PostCards ON Posts.analysis_id = PostCards.analysis_id
+  WHERE Users.username LIKE '%${searchTerm}%' OR Users.full_name LIKE '%${searchTerm}%' OR PostCards.prediction LIKE '%${searchTerm}%' OR Posts.caption LIKE '%${searchTerm}%'
+  OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.full_name LIKE '%${searchTerm}%'
+`;
+
+    query += `
+  GROUP BY Posts.post_id
+  ORDER BY Posts.date_created DESC
+`;
+
+    connection.query(query, (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching posts');
+        connection.release();
+        return;
+      }
+
+      let completedQueries = 0;
+      results.forEach((post, index) => {
+        const commentsQuery = `
+          SELECT comment_id, post_id, user_id, content, date_created, parent_comment_id
+          FROM Comments
+          WHERE post_id = ?
+          ORDER BY parent_comment_id ASC
+        `;
+
+        connection.query(commentsQuery, [post.post_id], (error, comments) => {
+          if (error) {
+            console.log(error);
+            res.status(500).send('An error occurred while fetching comments');
+            connection.release();
+            return;
+          }
+
+          const commentsWithReplies = comments.reduce((acc, comment) => {
+            if (comment.parent_comment_id) {
+              const parentComment = acc.find(
+                c => c.comment_id === comment.parent_comment_id,
+              );
+              if (parentComment) {
+                parentComment.replies = parentComment.replies || [];
+                parentComment.replies.push(comment);
+              }
+            } else {
+              acc.push(comment);
+            }
+            return acc;
+          }, []);
+
+          results[index].commentsArray = commentsWithReplies;
+
+          if (post.analysis_id) {
+            const analysisQuery = `
+              SELECT *
+              FROM PostCards
+              WHERE analysis_id = ?
+            `;
+
+            connection.query(
+              analysisQuery,
+              [post.analysis_id],
+              (error, analysis) => {
+                if (error) {
+                  console.log(error);
+                  res
+                    .status(500)
+                    .send('An error occurred while fetching analysis');
+                  connection.release();
+                  return;
+                }
+
+                results[index].analysis = analysis[0];
+                completedQueries++;
+
+                if (completedQueries === results.length) {
+                  res.status(200).json(results);
+                  connection.release();
+                }
+              },
+            );
+          } else {
+            completedQueries++;
+
+            if (completedQueries === results.length) {
+              res.status(200).json(results);
+              connection.release();
+            }
+          }
+        });
+      });
+    });
+  });
+});
+
+app.get('/search-users', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const searchTerm = req.query.searchTerm || '';
+    let query = `
+      SELECT *
+      FROM Users
+      WHERE username LIKE '%${searchTerm}%' OR full_name LIKE '%${searchTerm}%'
+    `;
+
+    connection.query(query, (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching users');
+        connection.release();
+        return;
+      }
+
+      res.status(200).json(results);
+      connection.release();
+    });
+  });
+});
+
+app.get('/search-relevant', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const searchTerm = req.query.searchTerm || '';
+    let query = `
+      SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments,
+      (
+        (CASE WHEN Users.username LIKE '%${searchTerm}%' THEN 1 ELSE 0 END) +
+        (CASE WHEN Users.full_name LIKE '%${searchTerm}%' THEN 1 ELSE 0 END) +
+        (CASE WHEN PostCards.prediction LIKE '%${searchTerm}%' THEN 1 ELSE 0 END) +
+        (CASE WHEN Posts.caption LIKE '%${searchTerm}%' THEN 1 ELSE 0 END) +
+        (CASE WHEN PostCards.symbol LIKE '%${searchTerm}%' THEN 1 ELSE 0 END) +
+        (CASE WHEN PostCards.full_name LIKE '%${searchTerm}%' THEN 1 ELSE 0 END)
+      ) AS relevance
+      FROM Posts
+      LEFT JOIN Likes ON Posts.post_id = Likes.post_id
+      LEFT JOIN Comments ON Posts.post_id = Comments.post_id
+      LEFT JOIN Users ON Posts.user_id = Users.user_id
+      LEFT JOIN PostCards ON Posts.analysis_id = PostCards.analysis_id
+      WHERE Users.username LIKE '%${searchTerm}%' OR Users.full_name LIKE '%${searchTerm}%' OR PostCards.prediction LIKE '%${searchTerm}%' OR Posts.caption LIKE '%${searchTerm}%'
+      OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.full_name LIKE '%${searchTerm}%'
+    `;
+
+    query += `
+      GROUP BY Posts.post_id
+      ORDER BY relevance DESC, Posts.date_created DESC
+    `;
+
+    connection.query(query, (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching posts');
+        connection.release();
+        return;
+      }
+
+      let completedQueries = 0;
+      results.forEach((post, index) => {
+        const commentsQuery = `
+          SELECT comment_id, post_id, user_id, content, date_created, parent_comment_id
+          FROM Comments
+          WHERE post_id = ?
+          ORDER BY parent_comment_id ASC
+        `;
+
+        connection.query(commentsQuery, [post.post_id], (error, comments) => {
+          if (error) {
+            console.log(error);
+            res.status(500).send('An error occurred while fetching comments');
+            connection.release();
+            return;
+          }
+
+          const commentsWithReplies = comments.reduce((acc, comment) => {
+            if (comment.parent_comment_id) {
+              const parentComment = acc.find(
+                c => c.comment_id === comment.parent_comment_id,
+              );
+              if (parentComment) {
+                parentComment.replies = parentComment.replies || [];
+                parentComment.replies.push(comment);
+              }
+            } else {
+              acc.push(comment);
+            }
+            return acc;
+          }, []);
+
+          results[index].commentsArray = commentsWithReplies;
+
+          if (post.analysis_id) {
+            const analysisQuery = `
+              SELECT *
+              FROM PostCards
+              WHERE analysis_id = ?
+            `;
+
+            connection.query(
+              analysisQuery,
+              [post.analysis_id],
+              (error, analysis) => {
+                if (error) {
+                  console.log(error);
+                  res
+                    .status(500)
+                    .send('An error occurred while fetching analysis');
+                  connection.release();
+                  return;
+                }
+
+                results[index].analysis = analysis[0];
+                completedQueries++;
+
+                if (completedQueries === results.length) {
+                  res.status(200).json(results);
+                  connection.release();
+                }
+              },
+            );
+          } else {
+            completedQueries++;
+
+            if (completedQueries === results.length) {
+              res.status(200).json(results);
+              connection.release();
+            }
+          }
+        });
+      });
+    });
+  });
+});
+
+app.get('/search-analysis', function (req, res) {
+  connection.getConnection(function (err, connection) {
+    if (err) {
+      console.log(err);
+      res
+        .status(500)
+        .send('An error occurred while connecting to the database');
+      return;
+    }
+
+    const searchTerm = req.query.searchTerm || '';
+    let query = `
+  SELECT Posts.*, Users.username, Users.full_name, COUNT(DISTINCT Likes.user_id) as likes, COUNT(DISTINCT Comments.comment_id) as comments
+  FROM Posts
+  LEFT JOIN Likes ON Posts.post_id = Likes.post_id
+  LEFT JOIN Comments ON Posts.post_id = Comments.post_id
+  LEFT JOIN Users ON Posts.user_id = Users.user_id
+  LEFT JOIN PostCards ON Posts.analysis_id = PostCards.analysis_id
+  WHERE (Users.username LIKE '%${searchTerm}%' OR Users.full_name LIKE '%${searchTerm}%' OR PostCards.prediction LIKE '%${searchTerm}%' OR Posts.caption LIKE '%${searchTerm}%'
+  OR PostCards.symbol LIKE '%${searchTerm}%' OR PostCards.full_name LIKE '%${searchTerm}%') AND Posts.analysis_id IS NOT NULL
+`;
+
+    query += `
+  GROUP BY Posts.post_id
+  ORDER BY Posts.date_created DESC
+`;
+
+    connection.query(query, (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while fetching posts');
+        connection.release();
+        return;
+      }
+
+      let completedQueries = 0;
+      results.forEach((post, index) => {
+        const commentsQuery = `
+      SELECT comment_id, post_id, user_id, content, date_created, parent_comment_id
+      FROM Comments
+      WHERE post_id = ?
+      ORDER BY parent_comment_id ASC
+    `;
+
+        connection.query(commentsQuery, [post.post_id], (error, comments) => {
+          if (error) {
+            console.log(error);
+            res.status(500).send('An error occurred while fetching comments');
+            connection.release();
+            return;
+          }
+
+          const commentsWithReplies = comments.reduce((acc, comment) => {
+            if (comment.parent_comment_id) {
+              const parentComment = acc.find(
+                c => c.comment_id === comment.parent_comment_id,
+              );
+              if (parentComment) {
+                parentComment.replies = parentComment.replies || [];
+                parentComment.replies.push(comment);
+              }
+            } else {
+              acc.push(comment);
+            }
+            return acc;
+          }, []);
+
+          results[index].commentsArray = commentsWithReplies;
+
+          if (post.analysis_id) {
+            const analysisQuery = `
+          SELECT *
+          FROM PostCards
+          WHERE analysis_id = ?
+        `;
+
+            connection.query(
+              analysisQuery,
+              [post.analysis_id],
+              (error, analysis) => {
+                if (error) {
+                  console.log(error);
+                  res
+                    .status(500)
+                    .send('An error occurred while fetching analysis');
+                  connection.release();
+                  return;
+                }
+
+                results[index].analysis = analysis[0];
+                completedQueries++;
+
+                if (completedQueries === results.length) {
+                  res.status(200).json(results);
+                  connection.release();
+                }
+              },
+            );
+          } else {
+            completedQueries++;
+
+            if (completedQueries === results.length) {
+              res.status(200).json(results);
+              connection.release();
+            }
+          }
+        });
+      });
+    });
+  });
+});
+
 app.listen(3001, () => {
   console.log('Go to http://localhost:3001/posts so you can see the data.');
 });
