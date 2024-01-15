@@ -1,12 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {View, FlatList} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import FeedItem from '../../components/FeedItem';
 import {useNavigation} from '@react-navigation/native';
+import SearchTextContext from '../../contexts/SearchTextContext';
 
-const PopularScreen = ({route}) => {
+const PopularScreen = () => {
   const navigation = useNavigation();
-  const searchText = route.params.searchText;
+  const searchText = useContext(SearchTextContext);
   console.log('searchTextPopular:', searchText);
   const [feedData, setFeedData] = useState([]);
 
