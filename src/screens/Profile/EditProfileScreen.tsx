@@ -13,10 +13,14 @@ import {useNavigation} from '@react-navigation/native';
 import tw from 'tailwind-react-native-classnames';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ImagePicker from 'react-native-image-crop-picker';
+import supabase from '../../../server/supabaseClient';
+import {decode} from 'base64-arraybuffer';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();
-
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedBannerImage, setSelectedBannerImage] = useState(null);
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
   const [description, setDescription] = useState('');
@@ -84,6 +88,51 @@ const EditProfileScreen = () => {
     ]);
   };
 
+  const openImagePicker = async (setImageFunction, cropWidth, cropHeight) => {
+    const pickedImage = await ImagePicker.openPicker({
+      width: cropWidth,
+      height: cropHeight,
+      cropping: true,
+      includeBase64: true,
+    });
+
+    setImageFunction(pickedImage.path);
+
+    const timestamp = Date.now();
+    const uniqueSign = Math.floor(Math.random() * 1000);
+    const fileName = `imagePost_${timestamp}_${uniqueSign}.jpg`;
+
+    const base64FileData = pickedImage.data;
+
+    const file = {
+      uri: pickedImage.path,
+      name: fileName,
+      type: 'image/jpeg',
+    };
+
+    const {data, error} = await supabase.storage
+      .from('post_photo')
+      .upload(file.name, decode(base64FileData), {
+        contentType: 'image/jpg',
+      });
+
+    if (error) {
+      console.error('Error uploading image: ', error);
+    } else {
+      const urlResponse = await supabase.storage
+        .from('post_photo')
+        .getPublicUrl(file.name);
+
+      if (urlResponse.error) {
+        console.error('Error getting image URL: ', urlResponse.error);
+      } else {
+        const imageUrl = urlResponse.data.publicUrl;
+        console.log('Image URL: ', imageUrl);
+        setImageFunction(imageUrl);
+      }
+    }
+  };
+
   return (
     <View style={[tw`flex-1`, {backgroundColor: '#002351'}]}>
       <View style={tw`flex-row justify-between items-center p-4`}>
@@ -102,28 +151,39 @@ const EditProfileScreen = () => {
       </View>
       <ScrollView style={styles.container}>
         <View style={{position: 'relative'}}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              openImagePicker(setSelectedBannerImage, 400, 100);
+            }}>
             <View
               style={[
                 styles.bannerImage,
                 {
-                  backgroundColor: userData?.banner_picture_url
-                    ? 'transparent'
-                    : 'grey',
+                  backgroundColor:
+                    selectedBannerImage || userData?.banner_picture_url
+                      ? 'transparent'
+                      : 'grey',
                 },
               ]}>
-              {userData?.banner_picture_url && (
+              {(selectedBannerImage || userData?.banner_picture_url) && (
                 <Image
                   style={StyleSheet.absoluteFill}
-                  source={{uri: userData.banner_picture_url}}
+                  source={{
+                    uri: selectedBannerImage || userData.banner_picture_url,
+                  }}
                 />
               )}
             </View>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              openImagePicker(setSelectedImage, 300, 400);
+            }}>
             <Image
               source={
-                userData?.profile_picture_url
+                selectedImage
+                  ? {uri: selectedImage}
+                  : userData?.profile_picture_url
                   ? {uri: userData.profile_picture_url}
                   : {
                       uri: `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(

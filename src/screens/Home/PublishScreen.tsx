@@ -25,6 +25,7 @@ const PublishScreen = () => {
   const [content, setContent] = useState('');
   const [showTradingPlanCard, setShowTradingPlanCard] = useState(false);
   const [tradingPlanCardValues, setTradingPlanCardValues] = useState({});
+  const [user, setUser] = useState(null);
 
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
@@ -140,6 +141,36 @@ const PublishScreen = () => {
     }
   };
 
+  const fetchUser = async () => {
+    const userId = await AsyncStorage.getItem('user_id');
+    try {
+      const response = await fetch(`http://10.0.2.2:3001/users/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('HTTP error ' + response.status);
+      }
+
+      const user = await response.json();
+      return user;
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+    }
+  };
+
+  useEffect(() => {
+    const getUser = async () => {
+      const fetchedUser = await fetchUser();
+      setUser(fetchedUser);
+    };
+
+    getUser();
+  }, []);
+
   return (
     <View style={[tw`flex-1`, {backgroundColor: '#002351'}]}>
       <View style={tw`p-4`}>
@@ -165,7 +196,18 @@ const PublishScreen = () => {
           </View>
         </View>
         <View style={tw`flex-row items-center mt-4`}>
-          <Icon name="user-circle" size={36} color="white" style={tw`mr-2`} />
+          <Image
+            source={
+              user?.profile_picture_url
+                ? {uri: user.profile_picture_url}
+                : {
+                    uri: `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
+                      user?.full_name || '',
+                    )}&size=36`,
+                  }
+            }
+            style={tw`mr-2 w-9 h-9 rounded-full border border-black`}
+          />
           <TextInput
             style={[tw`flex-1 p-2`, {color: 'white', flexShrink: 1}]}
             placeholder="What have you been eyeing lately?"

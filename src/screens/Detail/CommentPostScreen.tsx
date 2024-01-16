@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   TextInput,
@@ -12,15 +12,18 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Import M
 import tw from 'tailwind-react-native-classnames';
 import PublishButton from '../../components/PublishButton';
 import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CommentPostScreen = ({route}) => {
   const {postId} = route.params;
   const [content, setContent] = useState('');
-  const [showTradingPlanCard, setShowTradingPlanCard] = useState(false);
+  const [user, setUser] = useState(null);
   const navigation = useNavigation();
 
   const publishComment = async () => {
     try {
+      const storedUserId = await AsyncStorage.getItem('user_id');
+      console.log('storedUserId', storedUserId);
       const response = await fetch(
         `http://10.0.2.2:3001/posts/${postId}/comments`,
         {
@@ -29,7 +32,7 @@ const CommentPostScreen = ({route}) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            userId: 1,
+            userId: storedUserId,
             content: content,
           }),
         },
@@ -49,6 +52,36 @@ const CommentPostScreen = ({route}) => {
     }
   };
 
+  const fetchUser = async () => {
+    const userId = await AsyncStorage.getItem('user_id');
+    try {
+      const response = await fetch(`http://10.0.2.2:3001/users/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('HTTP error ' + response.status);
+      }
+
+      const user = await response.json();
+      return user;
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+    }
+  };
+
+  useEffect(() => {
+    const getUser = async () => {
+      const fetchedUser = await fetchUser();
+      setUser(fetchedUser);
+    };
+
+    getUser();
+  }, []);
+
   return (
     <View style={[tw`flex-1`, {backgroundColor: '#002351'}]}>
       <View style={tw`p-4`}>
@@ -64,7 +97,18 @@ const CommentPostScreen = ({route}) => {
           </View>
         </View>
         <View style={tw`flex-row items-center mt-4`}>
-          <Icon name="user-circle" size={36} color="white" style={tw`mr-2`} />
+          <Image
+            source={
+              user?.profile_picture_url
+                ? {uri: user.profile_picture_url}
+                : {
+                    uri: `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
+                      user?.full_name || '',
+                    )}&size=36`,
+                  }
+            }
+            style={tw`mr-2 w-9 h-9 rounded-full border border-black`}
+          />
           <TextInput
             style={[tw`flex-1 p-2`, {color: 'white', flexShrink: 1}]}
             placeholder="What have you been eyeing lately?"
