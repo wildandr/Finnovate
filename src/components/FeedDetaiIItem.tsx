@@ -126,7 +126,12 @@ const FeedDetailItem = ({item}: {item: any}) => {
             <Text style={tw`text-white ml-2`}>{likes}</Text>
           </View>
           <View style={tw`flex-row items-center`}>
-            <Fontisto name="comment" size={16} color="white" />
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('CommentPost', {postId: item.post_id})
+              }>
+              <Fontisto name="comment" size={16} color="white" />
+            </TouchableOpacity>
             <Text style={tw`text-white ml-2`}>{item.comments}</Text>
           </View>
         </View>
