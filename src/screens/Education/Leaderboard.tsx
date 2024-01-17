@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/themed';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Table, Row, Rows } from 'react-native-table-component';
 import level1Image from '../../assets/level1.png';
 import level2Image from '../../assets/level2.png';
@@ -61,7 +62,7 @@ const Leaderboard = () => {
     <View style={[tw`flex-1 px-4`, { backgroundColor: '#002351' }]}>
       <View style={[tw`flex-row mt-4 items-center pb-6 `]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon color={'white'} name="chevron-left" size={40} />
+          <MaterialIcons color={'white'} name="arrow-back-ios-new" size={24} />
         </TouchableOpacity>
         <Text style={[tw`w-full text-center text-white font-medium text-2xl`]}>
           Leaderboard
