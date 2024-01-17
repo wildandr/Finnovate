@@ -60,7 +60,7 @@ const HomeScreen = () => {
         style={tw`flex-row justify-between items-center absolute w-full px-5 top-5`}>
         <Image source={require('../../assets/Finnovate_logo_top.png')} />
         <View style={tw`flex-row`}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Notification')}>
             <Icon name="bell-o" size={24} color="white" style={tw`mr-3`} />
           </TouchableOpacity>
           <Icon name="cog" size={24} color="white" />

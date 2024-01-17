@@ -34,6 +34,9 @@ import FollowersScreen from './src/screens/Profile/FollowersScreen';
 import SearchScreen from './src/screens/Search/SearchScreen';
 import DetailPostScreen from './src/screens/Detail/DetailPostScreen';
 import CommentPostScreen from './src/screens/Detail/CommentPostScreen';
+import NotificationScreen from './src/screens/Home/NotificationScreen';
+import { set } from 'date-fns';
+import AddNotificationScreen from './src/screens/Detail/AddNotificationScreen';
 
 const RootStack = createStackNavigator();
 
@@ -121,6 +124,8 @@ function HomeStackGroup() {
       }}>
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="Publish" component={PublishScreen} />
+      <HomeStack.Screen name="Notification" component={NotificationScreen} />
+      <HomeStack.Screen name="DetailNotif" component={AddNotificationScreen} />
       <HomeStack.Screen name="Search" component={SearchScreen} />
       <HomeStack.Screen name="DetailPost" component={DetailPostScreen} />
       <HomeStack.Screen name="CommentPost" component={CommentPostScreen} />
@@ -213,9 +218,10 @@ export default function Navigation() {
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const value = await AsyncStorage.getItem('isLoggedIn');
-      setIsLoggedIn(value === 'true');
-      setIsLoading(false);
+      // const value = await AsyncStorage.getItem('isLoggedIn');
+      // setIsLoggedIn(value === 'true');
+      // setIsLoading(false);
+      setIsLoggedIn(true);
     };
 
     checkLoginStatus();
