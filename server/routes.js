@@ -519,6 +519,18 @@ app.get('/commentLikes', function (req, res) {
   });
 });
 
+app.get('/commentLikes/:comment_id', function (req, res) {
+  const comment_id = req.params.comment_id;
+  connection.query(
+    'SELECT * FROM CommentLikes WHERE comment_id = ?',
+    [comment_id],
+    function (error, results) {
+      if (error) throw error;
+      res.send(results);
+    },
+  );
+});
+
 // POST route for comment likes
 app.post('/commentLikes/create', function (req, res) {
   const {user_id, comment_id} = req.body;
@@ -528,9 +540,15 @@ app.post('/commentLikes/create', function (req, res) {
     (error, results) => {
       if (error) {
         console.log(error);
-        res.status(500).send('An error occurred while creating a comment like');
+        res.status(500).json({
+          message: 'An error occurred while creating a comment like',
+          error: error.sqlMessage,
+        });
       } else {
-        res.status(200).send('Comment like created successfully');
+        res.status(200).json({
+          message: 'Comment like created successfully',
+          results: results,
+        });
       }
     },
   );
@@ -545,9 +563,15 @@ app.delete('/commentLikes/delete', function (req, res) {
     (error, results) => {
       if (error) {
         console.log(error);
-        res.status(500).send('An error occurred while deleting a comment like');
+        res.status(500).json({
+          message: 'An error occurred while deleting a comment like',
+          error: error.sqlMessage,
+        });
       } else {
-        res.status(200).send('Comment like deleted successfully');
+        res.status(200).json({
+          message: 'Comment like deleted successfully',
+          results: results,
+        });
       }
     },
   );
@@ -970,7 +994,13 @@ app.put('/users/:userId/update', function (req, res) {
     }
 
     const {userId} = req.params;
-    const {username, full_name, description} = req.body;
+    const {
+      username,
+      full_name,
+      description,
+      profile_picture_url,
+      banner_picture_url,
+    } = req.body;
 
     let query = 'UPDATE Users SET date_updated = NOW(),';
     let queryParams = [];
@@ -988,6 +1018,16 @@ app.put('/users/:userId/update', function (req, res) {
     if (description) {
       query += ' description = ?,';
       queryParams.push(description);
+    }
+
+    if (profile_picture_url) {
+      query += ' profile_picture_url = ?,';
+      queryParams.push(profile_picture_url);
+    }
+
+    if (banner_picture_url) {
+      query += ' banner_picture_url = ?,';
+      queryParams.push(banner_picture_url);
     }
 
     query = query.slice(0, -1) + ' WHERE user_id = ?';
