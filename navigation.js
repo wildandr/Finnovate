@@ -37,6 +37,7 @@ import CommentPostScreen from './src/screens/Detail/CommentPostScreen';
 import NotificationScreen from './src/screens/Home/NotificationScreen';
 import { set } from 'date-fns';
 import AddNotificationScreen from './src/screens/Detail/AddNotificationScreen';
+import Leaderboard from './src/screens/Education/Leaderboard';
 
 const RootStack = createStackNavigator();
 
@@ -88,6 +89,7 @@ function EducationStackGroup() {
       <EducationStack.Screen name="CourseContent" component={CourseContent} />
       <EducationStack.Screen name="QuizScreen" component={QuizScreen} />
       <EducationStack.Screen name="QuizResult" component={QuizResult} />
+      <EducationStack.Screen name="Leaderboard" component={Leaderboard} />
     </EducationStack.Navigator>
   );
 }
