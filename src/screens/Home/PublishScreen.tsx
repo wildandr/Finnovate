@@ -80,6 +80,7 @@ const PublishScreen = () => {
     try {
       const {
         equitySymbol,
+        equityName,
         targetPrice,
         initiatePrice,
         timing,
@@ -94,6 +95,7 @@ const PublishScreen = () => {
         },
         body: JSON.stringify({
           symbol: equitySymbol,
+          equity_name: equityName,
           target_price: targetPrice,
           initial_price: initiatePrice,
           timing: timing,

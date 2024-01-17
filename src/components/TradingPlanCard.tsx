@@ -1,13 +1,22 @@
 import React, {useEffect, useState} from 'react';
-import {View, TextInput, TouchableOpacity} from 'react-native';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  TouchableHighlight,
+  Text,
+} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import DatePicker from 'react-native-date-picker';
 import DropdownPrediction from './DropdownPrediction';
 import {MaterialIcons} from 'react-native-vector-icons';
-import { ScrollView } from 'react-native-gesture-handler';
+import sahamData from '../data/saham.json';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const TradingPlanCard = ({onValuesChange}) => {
   const [equitySymbol, setEquitySymbol] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
   const [targetPrice, setTargetPrice] = useState('');
   const [initiatePrice, setInitiatePrice] = useState('');
   const [timing, setTiming] = useState<Date | null>(null);
@@ -15,6 +24,27 @@ const TradingPlanCard = ({onValuesChange}) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
+    const newSuggestions = sahamData.filter(
+      saham =>
+        saham.code.toLowerCase().includes(equitySymbol.toLowerCase()) ||
+        saham.name.toLowerCase().includes(equitySymbol.toLowerCase()),
+    );
+    setSuggestions(newSuggestions);
+  }, [equitySymbol]);
+
+  const handleInputChange = value => {
+    setEquitySymbol(value);
+  };
+
+  const handleSelectSuggestion = value => {
+    setEquitySymbol(value);
+    setSuggestions([]);
+  };
+
+  useEffect(() => {
+    const selectedEquity = sahamData.find(saham => saham.code === equitySymbol);
+    const equityName = selectedEquity ? selectedEquity.name : '';
+
     const upsidePercentage = calculateUpsidePercentage(
       parseFloat(initiatePrice),
       parseFloat(targetPrice),
@@ -22,6 +52,7 @@ const TradingPlanCard = ({onValuesChange}) => {
 
     onValuesChange({
       equitySymbol,
+      equityName,
       targetPrice,
       initiatePrice,
       timing,
@@ -38,16 +69,32 @@ const TradingPlanCard = ({onValuesChange}) => {
     <ScrollView>
       <DropdownPrediction onValueChange={setPrediction} />
       <View style={[tw`p-4`, {backgroundColor: '#2A476E'}]}>
-        <TextInput
-          value={equitySymbol}
-          onChangeText={setEquitySymbol}
-          placeholder="Enter equity symbol"
-          placeholderTextColor="gray"
-          style={[
-            tw`p-2 pl-4 rounded-lg border-0 text-white`,
-            {backgroundColor: '#001736'},
-          ]}
-        />
+        <View>
+          <TextInput
+            value={equitySymbol}
+            onChangeText={handleInputChange}
+            placeholder="Enter equity symbol"
+            placeholderTextColor="gray"
+            style={[
+              tw`p-2 pl-4 rounded-lg border-0 text-white`,
+              {backgroundColor: '#001736'},
+            ]}
+          />
+          {equitySymbol !== '' && (
+            <FlatList
+              data={suggestions}
+              keyExtractor={item => item.code}
+              renderItem={({item}) => (
+                <TouchableHighlight
+                  onPress={() => handleSelectSuggestion(item.code)}>
+                  <Text style={tw`p-2 text-white`}>
+                    {item.code} - {item.name}
+                  </Text>
+                </TouchableHighlight>
+              )}
+            />
+          )}
+        </View>
         <TextInput
           value={initiatePrice}
           onChangeText={setInitiatePrice}
