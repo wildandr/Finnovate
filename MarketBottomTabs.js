@@ -3,7 +3,7 @@ import React from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import tw from 'tailwind-react-native-classnames';
 import {Text} from 'react-native';
-import News from './src/components/News';
+import News from './src/screens/Market/News';
 import MarketTechnical from './src/screens/Market/MarketTechnical';
 import MarketFundamental from './src/screens/Market/MarketFundamental';
 

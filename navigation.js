@@ -17,7 +17,7 @@ import EducationScreen from './src/screens/Education/EducationScreen';
 import ProfileScreen from './src/screens/Profile/ProfileScreen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DetailEquity from './src/screens/Market/DetailEquity';
-import News from './src/components/News';
+import News from './src/components/NewsItem';
 import MarketTechnical from './src/screens/Market/MarketTechnical';
 import MarketFundamental from './src/screens/Market/MarketFundamental';
 import Course from './src/screens/Education/Course';
@@ -218,10 +218,9 @@ export default function Navigation() {
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      // const value = await AsyncStorage.getItem('isLoggedIn');
-      // setIsLoggedIn(value === 'true');
-      // setIsLoading(false);
-      setIsLoggedIn(true);
+      const value = await AsyncStorage.getItem('isLoggedIn');
+      setIsLoggedIn(value === 'true');
+      setIsLoading(false);
     };
 
     checkLoginStatus();
