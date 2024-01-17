@@ -1,45 +1,53 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
-import EquityContent from '../../components/EquityContent';
-import {useRoute, RouteProp, useNavigation} from '@react-navigation/native';
+import {useRoute, useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {Image} from 'react-native-elements';
 import MarketBottomTabs from '../../../MarketBottomTabs';
-
-type RootStackParamList = {
-  DetailEquity: {equity: any};
-};
+import goApiClient from '../../../server/goApiClient';
+import {LineChart} from 'react-native-svg-charts';
+import * as shape from 'd3-shape';
 
 const DetailEquity = () => {
-  const route = useRoute<RouteProp<RootStackParamList, 'DetailEquity'>>();
-  const equity = route.params?.equity;
+  const route = useRoute();
   const navigation = useNavigation();
+  const [historicalData, setHistoricalData] = useState(null);
+  const [priceData, setPriceData] = useState(null);
+  const closePrices = historicalData?.data.results.map(item => item.close);
+  const code = route.params?.code;
 
   const handleGoBack = () => {
     navigation.goBack();
   };
 
-  const [newsData, setNewsData] = useState([]);
   useEffect(() => {
-    const fetchNewsData = async () => {
+    const fetchHistoricalData = async () => {
       try {
-        const response = await fetch(
-          'https://berita-indo-api-next.vercel.app/api/cnbc-news/market',
-        );
-        const data = await response.json();
-
-        if (data && data.data) {
-          const latestNews = data.data.slice(0, 10);
-          setNewsData(latestNews);
-        }
+        const response = await goApiClient.get(`/stock/idx/${code}/historical`);
+        setHistoricalData(response.data);
       } catch (error) {
-        console.error('Error fetching news data:', error);
+        console.error('Error fetching historical data:', error);
       }
     };
 
-    fetchNewsData();
-  }, []);
+    fetchHistoricalData();
+  }, [code]);
+
+  useEffect(() => {
+    const fetchPriceData = async () => {
+      try {
+        const response = await goApiClient.get(
+          `/stock/idx/prices?symbols=${code}`,
+        );
+        setPriceData(response.data);
+      } catch (error) {
+        console.error('Error fetching price data:', error);
+      }
+    };
+
+    fetchPriceData();
+  }, [code]);
+
   return (
     <View style={[tw`flex-1`, {backgroundColor: '#001D43'}]}>
       <View style={[tw`px-4 flex-row mt-4 items-center justify-between`]}>
@@ -50,27 +58,54 @@ const DetailEquity = () => {
       </View>
       <Text
         style={[tw`mt-5 px-4 font-semibold`, {color: '#FFBC00', fontSize: 22}]}>
-        {equity.name}
+        {historicalData?.data?.results[0]?.symbol}
       </Text>
       <Text style={[tw`px-4`, {color: '#CBD5E1', fontSize: 14}]}>
-        {equity.company}.
+        {priceData?.data?.results[0]?.company?.name ?? 'Name not found'}
       </Text>
       <View style={[tw`px-4 flex-row mt-3 items-center justify-between`]}>
         <Text style={[tw`text-white font-bold`, {fontSize: 32}]}>
-          {equity.price}
+          {priceData?.data?.results[0]?.close}
         </Text>
         <View style={[tw`flex-row items-center `]}>
-          <Icon name="caret-up" size={12} color="#50CD89" style={tw``} />
-          <Text style={[tw` ml-1`, {color: '#50CD89', fontSize: 20}]}>
-            {equity.percent}%
+          <Icon
+            name={
+              priceData?.data?.results[0]?.change_pct >= 0
+                ? 'caret-up'
+                : 'caret-down'
+            }
+            size={12}
+            color={
+              priceData?.data?.results[0]?.change_pct >= 0 ? '#50CD89' : 'red'
+            }
+            style={tw``}
+          />
+          <Text
+            style={[
+              tw` ml-1`,
+              {
+                color:
+                  priceData?.data?.results[0]?.change_pct >= 0
+                    ? '#50CD89'
+                    : 'red',
+                fontSize: 20,
+              },
+            ]}>
+            {(priceData?.data?.results[0]?.change_pct ?? 0).toFixed(2)}
           </Text>
         </View>
       </View>
       <View style={[tw`px-4 `]}>
-        <Image
-          source={require('../../assets/chart.png')}
-          style={tw` w-full border border-gray-700 h-64 mt-5 mb-5`}
-        />
+        {closePrices ? (
+          <LineChart
+            style={{height: 200}}
+            data={closePrices}
+            svg={{stroke: 'rgb(255, 188, 0)'}}
+            contentInset={{top: 20, bottom: 20}}
+            curve={shape.curveNatural}></LineChart>
+        ) : (
+          <Text>Loading...</Text>
+        )}
       </View>
       <MarketBottomTabs />
     </View>
