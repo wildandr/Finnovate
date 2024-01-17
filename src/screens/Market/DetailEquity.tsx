@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import EquityContent from '../../components/EquityContent';
@@ -20,6 +20,26 @@ const DetailEquity = () => {
     navigation.goBack();
   };
 
+  const [newsData, setNewsData] = useState([]);
+  useEffect(() => {
+    const fetchNewsData = async () => {
+      try {
+        const response = await fetch(
+          'https://berita-indo-api-next.vercel.app/api/cnbc-news/market',
+        );
+        const data = await response.json();
+
+        if (data && data.data) {
+          const latestNews = data.data.slice(0, 10);
+          setNewsData(latestNews);
+        }
+      } catch (error) {
+        console.error('Error fetching news data:', error);
+      }
+    };
+
+    fetchNewsData();
+  }, []);
   return (
     <View style={[tw`flex-1`, {backgroundColor: '#001D43'}]}>
       <View style={[tw`px-4 flex-row mt-4 items-center justify-between`]}>

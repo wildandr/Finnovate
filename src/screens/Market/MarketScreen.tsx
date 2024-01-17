@@ -5,7 +5,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {equities} from '../../data/equities';
 import Equity from '../../components/Equity';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import NewsItem from '../../components/News';
+import NewsItem from '../../components/NewsItem';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const MarketScreen = () => {
   const [newsData, setNewsData] = useState([]);
@@ -31,7 +32,9 @@ const MarketScreen = () => {
   }, []);
 
   return (
+    <ScrollView style={[tw``, {backgroundColor: '#002351'}]}>
     <SafeAreaView style={[tw`flex-1 px-4`, {backgroundColor: '#002351'}]}>
+     
       <View
         style={[
           tw`mt-4 rounded-xl px-2 flex-row items-center `,
@@ -60,7 +63,10 @@ const MarketScreen = () => {
         keyExtractor={item => item.title}
         style={tw`mb-2`}
       />
+     
     </SafeAreaView>
+    </ScrollView>
+
   );
 };
 
