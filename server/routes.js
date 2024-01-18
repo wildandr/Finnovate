@@ -1529,6 +1529,7 @@ app.get('/search-relevant', function (req, res) {
   });
 });
 
+// GET route for all posts
 app.get('/search-analysis', function (req, res) {
   connection.getConnection(function (err, connection) {
     if (err) {
@@ -1638,6 +1639,372 @@ app.get('/search-analysis', function (req, res) {
         });
       });
     });
+  });
+});
+
+// GET route for all courses
+app.get('/courses', (req, res) => {
+  const query = `
+    SELECT
+        Courses.id AS course_id,
+        Courses.title AS course_title,
+        Courses.category,
+        Courses.image_path AS course_image,
+        Courses.duration,
+        Courses.description AS course_description,
+        Courses.difficulty,
+        Chapters.id AS chapter_id,
+        Chapters.title AS chapter_title,
+        Materials.id AS material_id,
+        Materials.title AS material_title,
+        Materials.description AS material_description,
+        MaterialDetails.id AS material_detail_id,
+        MaterialDetails.content AS material_detail_content,
+        Quiz.id AS quiz_id,
+        Quiz.question AS quiz_question,
+        Quiz.image AS quiz_image,
+        Quiz.explanation AS quiz_explanation,
+        QuizOptions.id AS option_id,
+        QuizOptions.options AS option_text,
+        QuizOptions.answer,
+        QuizOptions.isCorrect
+    FROM
+        Courses
+    JOIN Chapters ON Courses.id = Chapters.course_id
+    JOIN Materials ON Chapters.id = Materials.chapter_id
+    LEFT JOIN MaterialDetails ON Materials.id = MaterialDetails.material_id
+    LEFT JOIN Quiz ON Materials.id = Quiz.material_id
+    LEFT JOIN QuizOptions ON Quiz.id = QuizOptions.quiz_id;
+  `;
+
+  connection.query(query, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({error: 'An error occurred while fetching data'});
+    } else {
+      const courses = {};
+      results.forEach(row => {
+        if (!courses[row.course_id]) {
+          courses[row.course_id] = {
+            id: row.course_id,
+            title: row.course_title,
+            category: row.category,
+            image_path: row.course_image,
+            duration: row.duration,
+            description: row.course_description,
+            difficulty: row.difficulty,
+            chapters: {},
+          };
+        }
+
+        if (!courses[row.course_id].chapters[row.chapter_id]) {
+          courses[row.course_id].chapters[row.chapter_id] = {
+            id: row.chapter_id,
+            title: row.chapter_title,
+            materials: {},
+          };
+        }
+
+        if (
+          !courses[row.course_id].chapters[row.chapter_id].materials[
+            row.material_id
+          ]
+        ) {
+          courses[row.course_id].chapters[row.chapter_id].materials[
+            row.material_id
+          ] = {
+            id: row.material_id,
+            title: row.material_title,
+            description: row.material_description,
+            details: {},
+            quizzes: {},
+          };
+        }
+
+        if (row.material_detail_id) {
+          courses[row.course_id].chapters[row.chapter_id].materials[
+            row.material_id
+          ].details[row.material_detail_id] = {
+            id: row.material_detail_id,
+            content: row.material_detail_content,
+          };
+        }
+
+        if (row.quiz_id) {
+          if (
+            !courses[row.course_id].chapters[row.chapter_id].materials[
+              row.material_id
+            ].quizzes[row.quiz_id]
+          ) {
+            courses[row.course_id].chapters[row.chapter_id].materials[
+              row.material_id
+            ].quizzes[row.quiz_id] = {
+              id: row.quiz_id,
+              question: row.quiz_question,
+              image: row.quiz_image,
+              explanation: row.quiz_explanation,
+              options: {},
+            };
+          }
+
+          if (row.option_id) {
+            courses[row.course_id].chapters[row.chapter_id].materials[
+              row.material_id
+            ].quizzes[row.quiz_id].options[row.option_id] = {
+              id: row.option_id,
+              options: row.option_text,
+              answer: row.answer,
+              isCorrect: row.isCorrect,
+            };
+          }
+        }
+      });
+
+      res.status(200).json(courses);
+    }
+  });
+});
+
+// GET route for a single course
+app.get('/courses/:id', (req, res) => {
+  const courseId = req.params.id;
+  const query = `
+    SELECT
+        Courses.id AS course_id,
+        Courses.title AS course_title,
+        Courses.category,
+        Courses.image_path AS course_image,
+        Courses.duration,
+        Courses.description AS course_description,
+        Courses.difficulty,
+        Chapters.id AS chapter_id,
+        Chapters.title AS chapter_title,
+        Materials.id AS material_id,
+        Materials.title AS material_title,
+        Materials.description AS material_description,
+        MaterialDetails.id AS material_detail_id,
+        MaterialDetails.content AS material_detail_content,
+        Quiz.id AS quiz_id,
+        Quiz.question AS quiz_question,
+        Quiz.image AS quiz_image,
+        Quiz.explanation AS quiz_explanation,
+        QuizOptions.id AS option_id,
+        QuizOptions.options AS option_text,
+        QuizOptions.answer,
+        QuizOptions.isCorrect
+    FROM
+        Courses
+    JOIN Chapters ON Courses.id = Chapters.course_id
+    JOIN Materials ON Chapters.id = Materials.chapter_id
+    LEFT JOIN MaterialDetails ON Materials.id = MaterialDetails.material_id
+    LEFT JOIN Quiz ON Materials.id = Quiz.material_id
+    LEFT JOIN QuizOptions ON Quiz.id = QuizOptions.quiz_id
+    WHERE Courses.id = ?;
+  `;
+
+  connection.query(query, [courseId], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({error: 'An error occurred while fetching data'});
+    } else {
+      const courses = {};
+      results.forEach(row => {
+        if (!courses[row.course_id]) {
+          courses[row.course_id] = {
+            id: row.course_id,
+            title: row.course_title,
+            category: row.category,
+            image_path: row.course_image,
+            duration: row.duration,
+            description: row.course_description,
+            difficulty: row.difficulty,
+            chapters: {},
+          };
+        }
+
+        if (!courses[row.course_id].chapters[row.chapter_id]) {
+          courses[row.course_id].chapters[row.chapter_id] = {
+            id: row.chapter_id,
+            title: row.chapter_title,
+            materials: {},
+          };
+        }
+
+        if (
+          !courses[row.course_id].chapters[row.chapter_id].materials[
+            row.material_id
+          ]
+        ) {
+          courses[row.course_id].chapters[row.chapter_id].materials[
+            row.material_id
+          ] = {
+            id: row.material_id,
+            title: row.material_title,
+            description: row.material_description,
+            details: {},
+            quizzes: {},
+          };
+        }
+
+        if (row.material_detail_id) {
+          courses[row.course_id].chapters[row.chapter_id].materials[
+            row.material_id
+          ].details[row.material_detail_id] = {
+            id: row.material_detail_id,
+            content: row.material_detail_content,
+          };
+        }
+
+        if (row.quiz_id) {
+          if (
+            !courses[row.course_id].chapters[row.chapter_id].materials[
+              row.material_id
+            ].quizzes[row.quiz_id]
+          ) {
+            courses[row.course_id].chapters[row.chapter_id].materials[
+              row.material_id
+            ].quizzes[row.quiz_id] = {
+              id: row.quiz_id,
+              question: row.quiz_question,
+              image: row.quiz_image,
+              explanation: row.quiz_explanation,
+              options: {},
+            };
+          }
+
+          if (row.option_id) {
+            courses[row.course_id].chapters[row.chapter_id].materials[
+              row.material_id
+            ].quizzes[row.quiz_id].options[row.option_id] = {
+              id: row.option_id,
+              options: row.option_text,
+              answer: row.answer,
+              isCorrect: row.isCorrect,
+            };
+          }
+        }
+      });
+
+      res.status(200).json(courses);
+    }
+  });
+});
+
+// GET route for all chapters in a course
+app.get('/courses/:id/chapters', (req, res) => {
+  const courseId = req.params.id;
+  const query = `
+    SELECT
+        Chapters.id AS chapter_id,
+        Chapters.title AS chapter_title
+    FROM
+        Chapters
+    WHERE Chapters.course_id = ?;
+  `;
+
+  connection.query(query, [courseId], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({error: 'An error occurred while fetching data'});
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+// GET route for all materials in a chapter
+app.get('/chapters/:id/materials', (req, res) => {
+  const chapterId = req.params.id;
+  const query = `
+    SELECT
+        Materials.id AS material_id,
+        Materials.title AS material_title,
+        Materials.description AS material_description
+    FROM
+        Materials
+    WHERE Materials.chapter_id = ?;
+  `;
+
+  connection.query(query, [chapterId], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({error: 'An error occurred while fetching data'});
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+// GET route for a single material detail
+app.get('/materials/:id/details', (req, res) => {
+  const materialId = req.params.id;
+  const query = `
+    SELECT
+        MaterialDetails.id AS material_detail_id,
+        MaterialDetails.content AS material_detail_content
+    FROM
+        MaterialDetails
+    WHERE MaterialDetails.material_id = ?;
+  `;
+
+  connection.query(query, [materialId], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({error: 'An error occurred while fetching data'});
+    } else {
+      res.status(200).json(results);
+    }
+  });
+});
+
+// GET route for quizzes in a material
+app.get('/materials/:id/quizzes', (req, res) => {
+  const materialId = req.params.id;
+  const query = `
+    SELECT
+        Quiz.id AS quiz_id,
+        Quiz.question AS quiz_question,
+        Quiz.image AS quiz_image,
+        Quiz.explanation AS quiz_explanation,
+        QuizOptions.id AS option_id,
+        QuizOptions.options AS option_text,
+        QuizOptions.answer,
+        QuizOptions.isCorrect
+    FROM
+        Quiz
+    LEFT JOIN QuizOptions ON Quiz.id = QuizOptions.quiz_id
+    WHERE Quiz.material_id = ?;
+  `;
+
+  connection.query(query, [materialId], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({error: 'An error occurred while fetching data'});
+    } else {
+      const quizzes = {};
+      results.forEach(row => {
+        if (!quizzes[row.quiz_id]) {
+          quizzes[row.quiz_id] = {
+            id: row.quiz_id,
+            question: row.quiz_question,
+            image: row.quiz_image,
+            explanation: row.quiz_explanation,
+            options: {},
+          };
+        }
+
+        if (row.option_id) {
+          quizzes[row.quiz_id].options[row.option_id] = {
+            id: row.option_id,
+            options: row.option_text,
+            answer: row.answer,
+            isCorrect: row.isCorrect,
+          };
+        }
+      });
+
+      res.status(200).json(quizzes);
+    }
   });
 });
 
