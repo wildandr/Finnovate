@@ -15,6 +15,7 @@ import PlusButton from '../../components/PlusButton';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNRestart from 'react-native-restart';
+import {testConnection} from '../../../server/goApiClient';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
