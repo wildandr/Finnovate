@@ -3613,11 +3613,7 @@ cssesc@^3.0.0:
   resolved "https://registry.npmjs.org/cssesc/-/cssesc-3.0.0.tgz"
   integrity sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==
 
-<<<<<<< HEAD
-csstype@^3.0.10, csstype@^3.0.2, csstype@^3.0.3:
-=======
-csstype@^3.0.10, csstype@^3.0.2, csstype@^3.1.2:
->>>>>>> 7477b99df40674960212cd7186e28434a49da70c
+csstype@^3.0.10, csstype@^3.0.2, csstype@^3.0.3, csstype@^3.1.2:
   version "3.1.3"
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz"
   integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==

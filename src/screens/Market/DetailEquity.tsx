@@ -3,6 +3,7 @@ import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import {useRoute, useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MarketBottomTabs from '../../../MarketBottomTabs';
 import goApiClient from '../../../server/goApiClient';
 // import {LineChart, XAxis} from 'react-native-svg-charts';
@@ -85,7 +86,7 @@ const DetailEquity = () => {
     <View style={[tw`flex-1`, {backgroundColor: '#001D43'}]}>
       <View style={[tw`px-4 flex-row mt-4 items-center justify-between`]}>
         <TouchableOpacity onPress={handleGoBack}>
-          <Icon name="chevron-left" size={24} color="white" style={tw``} />
+        <MaterialIcons color={'white'} name="arrow-back-ios-new" size={24} />
         </TouchableOpacity>
         <Icon name="star-o" size={24} color="white" style={tw`justify-end`} />
       </View>

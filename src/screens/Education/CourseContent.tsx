@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import tw from 'tailwind-react-native-classnames';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 import {FlatList, ScrollView} from 'react-native-gesture-handler';
 
@@ -24,7 +24,7 @@ const CourseContent = () => {
             tw`px-4 flex-row mt-4 items-center pb-6 border-b border-gray-200`,
           ]}>
           <TouchableOpacity onPress={handleGoBack}>
-            <Icon name="chevron-left" size={24} style={tw`text-black`} />
+          <MaterialIcons color={'black'} name="arrow-back-ios-new" size={24} />
           </TouchableOpacity>
         </View>
         <View style={[tw`px-4 mt-5  `]}>

@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { CourseScreenRouteProp, CourseScreenNavigationProp } from './Course';
 import { courses } from '../../data/courses';
@@ -52,7 +52,7 @@ const DetailCourse = ({ route }: Props) => {
     <View style={[tw`h-full`, { backgroundColor: '#FFFFFF' }]}>
       <View style={[tw`px-4 flex-row mt-4 items-center pb-6 border-b border-gray-200`]}>
         <TouchableOpacity onPress={handleGoBack}>
-          <Icon name="chevron-left" size={24} style={tw`text-black`} />
+        <MaterialIcons color={'black'} name="arrow-back-ios-new" size={24} />
         </TouchableOpacity>
         <Text style={[tw`w-full text-center text-black font-medium`, { fontSize: 24 }]}>
           Course Detail
