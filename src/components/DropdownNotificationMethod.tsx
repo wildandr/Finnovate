@@ -7,7 +7,7 @@ const data = [
   {label: 'APALAH', value: '2'},
 ];
 
-const DropdownNotification = ({onValueChange}) => {
+const DropdownNotificationMethod = ({onValueChange}) => {
   // add onValueChange prop
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
@@ -41,7 +41,7 @@ const DropdownNotification = ({onValueChange}) => {
   );
 };
 
-export default DropdownNotification;
+export default DropdownNotificationMethod;
 
 const styles = StyleSheet.create({
   container: {

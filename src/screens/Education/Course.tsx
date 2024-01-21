@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import tw from 'tailwind-react-native-classnames';
-import { courses } from '../../data/courses';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -30,21 +29,62 @@ export type Props = {
 
 const Course = ({ route, navigation }: Props) => {
   const { category } = route.params || {};
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    // Fetch courses from the endpoint when the component mounts
+    fetch('http://10.0.2.2:3001/courses')
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Fetched courses:', data); // Log the received data
+        setCourses(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching courses:', error);
+      });
+  }, []); // Empty dependency array ensures the effect runs only once on mount
 
   const filteredCourses = category
-    ? courses.filter((course) => course.category === category)
-    : courses;
+    ? Object.values(courses)
+        .filter((course) => course.category === category)
+        .map((course) => ({
+          ...course,
+          image_path: `http://10.0.2.2:3001/courses/${course.image_path}`,
+          chapters: Object.values(course.chapters).map((chapter) => ({
+            ...chapter,
+            materials: Object.values(chapter.materials).map((material) => ({
+              ...material,
+              quizzes: Object.values(material.quizzes).map((quiz) => ({
+                ...quiz,
+                options: Object.values(quiz.options),
+              })),
+            })),
+          })),
+        }))
+    : Object.values(courses).map((course) => ({
+        ...course,
+        image_path: `http://10.0.2.2:3001/courses/${course.image_path}`,
+        chapters: Object.values(course.chapters).map((chapter) => ({
+          ...chapter,
+          materials: Object.values(chapter.materials).map((material) => ({
+            ...material,
+            quizzes: Object.values(material.quizzes).map((quiz) => ({
+              ...quiz,
+              options: Object.values(quiz.options),
+            })),
+          })),
+        })),
+      }));
 
-  const handlePress = (course: any) => {
-    const courseIndex = courses.findIndex((c) => c.id === course.id);
-    navigation.navigate('DetailCourse', { courseIndex });
+  const handlePress = (courseId: string) => {
+    navigation.navigate('DetailCourse', { courseId });
   };
 
   const renderCourseItem = ({ item }: { item: typeof courses[number] }) => (
-    <TouchableOpacity onPress={() => handlePress(item)}>
+    <TouchableOpacity onPress={() => handlePress(item.id)}>
       <View style={[tw`mt-3 rounded-lg py-4 px-5`, { backgroundColor: '#2A476E' }]}>
         <View style={[tw`flex-row `]}>
-          <Image source={item.image} style={tw`w-1/3 h-24`} />
+          <Image source={{ uri: item.image_path }} style={tw`w-1/3 h-24`} />
           <View style={[tw`ml-5`]}>
             <Text style={[tw`text-left text-white font-semibold`, { fontSize: 20 }]}>
               {item.title}
@@ -64,7 +104,7 @@ const Course = ({ route, navigation }: Props) => {
     <FlatList
       style={[tw`h-full  px-4 pb-5`, { backgroundColor: '#002351' }]}
       data={filteredCourses}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.id.toString()}
       renderItem={renderCourseItem}
     />
   );

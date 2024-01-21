@@ -1,12 +1,14 @@
 // EducationScreen.js
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import tw from 'tailwind-react-native-classnames';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { Icon } from '@rneui/themed';
 import EducationTopTab from '../../../EducationTopTab';
+import { useNavigation } from '@react-navigation/native';
 
 const EducationScreen = () => {
+  const navigation = useNavigation();
   return (
     <SafeAreaView style={[tw`flex-1  `, { backgroundColor: '#002351' }]}>
       <View style={[tw`px-4 mb-5`,]}>
@@ -18,7 +20,9 @@ const EducationScreen = () => {
               <Text style={[tw`text-white mt-1 font-light`, { fontSize: 14 }]}>Level 20 / 4000 xp</Text>
             </View>
           </View>
-          <Icon name="ranking-star" size={24} color="white" style={tw`justify-end`} />
+          <TouchableOpacity onPress={() => navigation.navigate('Leaderboard')}>
+          <Icon name="leaderboard" size={24} color="white" style={tw`justify-end`} />
+          </TouchableOpacity>
         </View>
         <Text style={[tw`text-white mt-5 font-semibold text-2xl tracking-wide`, {}]}>
           Dive into the World of Smart Investing with <Text style={[tw``, { color: '#FFBC00' }]}>Finnovate!</Text>
