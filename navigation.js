@@ -25,7 +25,7 @@ import DetailCourse from './src/screens/Education/DetailCourse';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 
 import PublishScreen from './src/screens/Home/PublishScreen';
-import CourseContent from './src/screens/Education/CourseContent';
+import CourseContent from './src/screens/Education/MaterialContent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import QuizScreen from './src/screens/Education/QuizScreen';
 import QuizResult from './src/screens/Education/QuizResult';
@@ -38,6 +38,7 @@ import NotificationScreen from './src/screens/Home/NotificationScreen';
 import { set } from 'date-fns';
 import AddNotificationScreen from './src/screens/Detail/AddNotificationScreen';
 import Leaderboard from './src/screens/Education/Leaderboard';
+import MaterialContent from './src/screens/Education/MaterialContent';
 
 const RootStack = createStackNavigator();
 
@@ -86,7 +87,7 @@ function EducationStackGroup() {
         component={EducationScreen}
       />
       <EducationStack.Screen name="DetailCourse" component={DetailCourse} />
-      <EducationStack.Screen name="CourseContent" component={CourseContent} />
+      <EducationStack.Screen name="MaterialContent" component={MaterialContent} />
       <EducationStack.Screen name="QuizScreen" component={QuizScreen} />
       <EducationStack.Screen name="QuizResult" component={QuizResult} />
       <EducationStack.Screen name="Leaderboard" component={Leaderboard} />
